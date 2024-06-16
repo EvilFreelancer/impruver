@@ -1,0 +1,6 @@
+/.idea/
+/venv/
+/impruver.egg-info/
+/build/
+/*.yaml
+__pycache__
