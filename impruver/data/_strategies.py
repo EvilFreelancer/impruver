@@ -17,8 +17,22 @@ def last_message_by_assistant(
     _log.debug(f"Max tokens count: {max_tokens_count}")
     while messages:
 
-        # Apply chat format
-        formated_messages = apply_chat_template(messages, chat_template=chat_template, tokenize=False)
+        # Apply chat format from template
+        if hasattr(tokenizer, 'apply_chat_template'):
+            # On modern tokenizers we may use chat_template
+            formated_messages = tokenizer.apply_chat_template(
+                messages,
+                chat_template=chat_template,  # Use default_chat_template if None
+                tokenize=False
+            )
+        else:
+            # On old tokenizers we will use a custom apply_chat_template
+            formated_messages = apply_chat_template(
+                messages,
+                chat_template=chat_template,  # Use DEFAULT_CHAT_TEMPLATE if None
+                tokenize=False,
+                tokenizer=tokenizer
+            )
 
         # Tokenize all messages and count total tokens
         tokenized_messages = tokenizer.encode(formated_messages, return_tensors="pt")
