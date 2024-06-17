@@ -13,6 +13,9 @@ class Tokenizer(Protocol):
     # Tokens indicating that generation should stop
     stop_tokens: Set[int]
 
+    # Max length of model' context
+    model_max_length: int
+
     def encode(self, text: str | List[str], **kwargs) -> List[int] | List[List[int]]:
         """
         Given a string, return the a list of token ids.

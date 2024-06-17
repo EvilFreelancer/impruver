@@ -34,7 +34,7 @@ def last_message_by_assistant(
                 tokenizer=tokenizer
             )
 
-        # Tokenize all messages and count total tokens
+        # Tokenize all messages
         tokenized_messages = tokenizer.encode(formated_messages, return_tensors="pt")
 
         # Calculate sum of total tokens of all formated messages

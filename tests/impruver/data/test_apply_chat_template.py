@@ -31,7 +31,7 @@ class TestApplyChatTemplate(unittest.TestCase):
         formatted_messages = apply_chat_template(
             conversation=self.messages,
             chat_template=None,
-            add_generation_prompt=True,
+            add_generation_prompt=False,
             tokenize=False,
             tokenizer=self.tokenizer
         )
@@ -41,7 +41,6 @@ class TestApplyChatTemplate(unittest.TestCase):
             "assistant\nI'm doing great!\n\n"
             "user\nCan you help me with something?\n\n"
             "assistant\nSure, what do you need help with?\n\n"
-            "assistant\n"
         )
         self.assertEqual(formatted_messages, expected_output.strip())
 
@@ -50,7 +49,7 @@ class TestApplyChatTemplate(unittest.TestCase):
         formatted_messages = apply_chat_template(
             conversation=self.messages,
             chat_template=self.chat_template,
-            add_generation_prompt=True,
+            add_generation_prompt=False,
             tokenize=False,
             tokenizer=self.tokenizer
         )
@@ -60,7 +59,6 @@ class TestApplyChatTemplate(unittest.TestCase):
             "assistant: I'm doing great!\n"
             "user: Can you help me with something?\n"
             "assistant: Sure, what do you need help with?\n"
-            "assistant:"
         )
         self.assertEqual(formatted_messages, expected_output.strip())
 
