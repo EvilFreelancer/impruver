@@ -4,7 +4,7 @@ from pathlib import Path
 from numpy import ndarray
 from torch import Tensor
 
-from .metric_logger_interface import MetricLoggerInterface
+from ._metric_logger_interface import MetricLoggerInterface
 
 Scalar = Union[Tensor, ndarray, int, float]
 

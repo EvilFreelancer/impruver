@@ -1,0 +1,24 @@
+model:
+  _component_: transformers.AutoModelForCausalLM
+  path: ai-forever/rugpt3small_based_on_gpt2
+  load_in_8bit: True
+
+tokenizer:
+  _component_: transformers.AutoTokenizer
+  path: ai-forever/rugpt3small_based_on_gpt2
+
+lora:
+  r: 32
+  lora_alpha: 16
+  lora_dropout: 0.0
+  # bias: "none"
+  target_modules:
+    - "c_attn"
+    - "c_proj"
+    - "c_fc"
+  modules_to_save:
+    - "lm_head"
+  # use_gradient_checkpointing: "unsloth"
+
+dtype: fp32
+device: cpu

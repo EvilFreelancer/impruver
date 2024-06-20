@@ -1,16 +1,18 @@
-# import random
-# import json
-# import os
-# import fire
-# import wandb
-# import torch
-# import numpy as np
+import random
+
+import fire
+import torch
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
-    # DataCollatorForTokenClassification,
-    # AutoConfig,
+    DataCollatorForTokenClassification,
 )
+
+from impruver.config import Config, log_config
+from impruver.utils import dynamic_import, get_dtype, get_device
+from recipes._train_interface import TrainInterface
+
+
 # from transformers import (
 #     Trainer,
 #     TrainingArguments,
@@ -21,132 +23,111 @@ from transformers import (
 #     BitsAndBytesConfig,
 # )
 # from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
-from peft import get_peft_model, LoraConfig
 # from unsloth.models._utils import prepare_model_for_kbit_training
 
 
-from ._train_interface import TrainInterface
-
-
 class LoraSingleDevice(TrainInterface):
+    _device: torch.device
+    _dtype: torch.dtype
+    _model = None
+    _tokenizer = None
+    _config: Config
 
-    def __init__(self):
-        self._model = None
-        self._tokenizer = None
-        self._config = None
+    def __init__(self, cfg: Config):
+        # Setup configuration
+        self._config = cfg
 
-    def load_config(self, path_to_config: str):
-        ...
+        # Setup precision and device object
+        self._device = get_device(self._config.device)
+        self._dtype = get_dtype(self._config.dtype)
 
     def _setup_model_and_tokenizer(self):
-        model_path_or_name = tokenizer_path_or_name = self.config.path_or_name
+        # Load tokenizer
+        _tokenizer_cls = dynamic_import(self._config.tokenizer.component)
+        self._tokenizer = _tokenizer_cls.from_pretrained(
+            self._config.tokenizer.path
+        )
 
-        self._tokenizer = AutoTokenizer.from_pretrained(tokenizer_path_or_name)
-        self._model = AutoModelForCausalLM.from_pretrained(model_path_or_name)
+        # Load model
+        _model_cls = dynamic_import(self._config.model.component)
+        self._model = _model_cls.from_pretrained(
+            self._config.model.path,
+            load_in_8bit=self._config.model.load_in_8bit,
+            load_in_4bit=self._config.model.load_in_4bit,
+            torch_dtype=self._dtype,
+            attn_implementation=self._config.model.attn_implementation,
+        ).to(self._device)
+
+        # If unsloth training is enabled
+        # if self._config.unsloth:
+        #     from unsloth.models._utils import prepare_model_for_kbit_training
+        #     self._model = prepare_model_for_kbit_training(self._model)
+
+        # If LoRA training is enabled
+        if self._config.lora:
+            from peft import get_peft_model, LoraConfig
+
+            print(self._config.lora.export())
+            exit()
+
+            _lora_config = LoraConfig(**self._config.lora.model_dump())
+
+            print(_lora_config)
+            exit()
+
+            self._model = get_peft_model(self._model, lora_config)
 
     def _setup_datasets(self):
-        datasets = self.config.datasets
+        train_file = self._config.dataset.train_file
+        val_file = self._config.dataset.val_file
+        max_tokens_count = self._config.dataset.max_tokens_count
+        only_target_loss = self._config.dataset.only_target_loss
+        sample_rate = self._config.dataset.sample_rate
+
+        # train_records = read_jsonl(train_file)
+        # val_records = read_jsonl(val_file)
+        # random.shuffle(train_records)
+        #
+        # datasets = []
+        # for records in (train_records, val_records):
+        #     datasets.append(
+        #         ChatDataset(
+        #             records,
+        #             self._tokenizer,
+        #             max_tokens_count=max_tokens_count,
+        #             sample_rate=sample_rate,
+        #             only_target_loss=only_target_loss,
+        #         )
+        #     )
+        # self._train_dataset, self._val_dataset = datasets
+        # self._data_collator = DataCollatorForTokenClassification(self._tokenizer, pad_to_multiple_of=8)
 
     def setup(self):
         self._setup_model_and_tokenizer()
-        self._setup_datasets()
+        # self._setup_datasets()
 
-    def train(self):
-        ...
+    # def train(self):
+    #     ...
+    #     # Last step is config saving
+    #     # self.save_checkpoint()
+    #
+    # def cleanup(self):
+    #     ...
+    #
+    # def save_checkpoint(self):
+    #     self._model.save_pretrained(self._config.output_dir)
+    #     self._tokenizer.save_pretrained(self._config.output_dir)
 
-    def save_checkpoints(self):
-        ...
 
-# from src.dataset import ChatDataset
-# from src.util.dl import set_random_seed
-# from src.util.io import read_jsonl
-#
-#
-# def train(
-#     config_file: str,
-#     train_file: str,
-#     val_file: str,
-#     output_dir: str,
-#     sample_rate: float = 1.0,
-#     report_to: str = "wandb",
-#     seed: int = 42,
-# ):
-#     set_random_seed(seed)
-#     logging.set_verbosity_info()
-#     with open(config_file, "r") as r:
-#         config = json.load(r)
-#
-#     trainer_config = config.get("trainer")
-#     lora_config = config.get("lora")
-#     training_args = TrainingArguments(
-#         output_dir=output_dir, report_to=report_to, **trainer_config
-#     )
-#
-#     model_name = config["model_name"]
-#     tokenizer_name = config.get("tokenizer_name", model_name)
-#
-#     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-#     tokenizer.save_pretrained(output_dir)
-#
-#     train_records = read_jsonl(train_file)
-#     val_records = read_jsonl(val_file)
-#     random.shuffle(train_records)
-#     print(train_records[0])
-#
-#     only_target_loss = config.get("only_target_loss", True)
-#     max_tokens_count = config["max_tokens_count"]
-#
-#     datasets = []
-#     for records in (train_records, val_records):
-#         datasets.append(
-#             ChatDataset(
-#                 records,
-#                 tokenizer,
-#                 max_tokens_count=max_tokens_count,
-#                 sample_rate=sample_rate,
-#                 only_target_loss=only_target_loss,
-#             )
-#         )
-#     train_dataset, val_dataset = datasets
-#     data_collator = DataCollatorForTokenClassification(tokenizer, pad_to_multiple_of=8)
-#
-#     print("INPUT_IDS")
-#     print(data_collator([train_dataset[0], train_dataset[1]])["input_ids"][0])
-#     print("MASK")
-#     print(data_collator([train_dataset[0], train_dataset[1]])["attention_mask"][0])
-#     print("LABELS")
-#     print(data_collator([train_dataset[0], train_dataset[1]])["labels"][0])
-#
-#     load_in_8bit = bool(config.get("load_in_8bit", False))
-#     load_in_4bit = bool(config.get("load_in_4bit", False))
-#     model = AutoModelForCausalLM.from_pretrained(
-#         model_name,
-#         load_in_8bit=load_in_8bit,
-#         load_in_4bit=load_in_4bit,
-#         device_map="auto",
-#         torch_dtype=torch.bfloat16,
-#         attn_implementation="flash_attention_2",
-#     )
-#     model = prepare_model_for_kbit_training(model)
-#
-#     if lora_config:
-#         lora_config = LoraConfig(**lora_config)
-#         model = get_peft_model(model, lora_config)
-#
-#     trainer = Trainer(
-#         model=model,
-#         args=training_args,
-#         train_dataset=train_dataset,
-#         eval_dataset=val_dataset,
-#         data_collator=data_collator,
-#     )
-#
-#     if trainer_config.get("report_to", "wandb") == "wandb":
-#         wandb.init(project="rulm_self_instruct", name=config_file)
-#
-#     trainer.train()
-#     model.save_pretrained(output_dir)
-#
-#
-# if __name__ == "__main__":
-#     fire.Fire(train)
+def recipe_main(cfg: str) -> None:
+    config = Config.from_yaml(cfg)
+    log_config(recipe_name="LoraSingleDevice", cfg=config)
+
+    recipe = LoraSingleDevice(cfg=config)
+    recipe.setup()
+    # recipe.train()
+    # recipe.cleanup()
+
+
+if __name__ == "__main__":
+    fire.Fire(recipe_main)

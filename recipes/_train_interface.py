@@ -1,18 +1,12 @@
 class TrainInterface:
 
-    def load_config(self, config):
-        ...
-
-    def load_checkpoints(self):
-        ...
-
-    def load_datasets(self):
-        ...
-
     def setup(self):
         ...
 
     def train(self):
+        ...
+
+    def cleanup(self):
         ...
 
     def save_checkpoints(self):

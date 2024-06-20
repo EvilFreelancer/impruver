@@ -18,7 +18,7 @@ class TokenizerConfig(BaseModel):
 class ModelConfig(BaseModel):
     component: str = Field(..., alias='_component_')
     path: str
-    attn_implementation: str | None = None
+    attn_implementation: Optional[str] = None
     load_in_4bit: bool = False
     load_in_8bit: bool = False
 
@@ -31,6 +31,19 @@ class DatasetConfig(BaseModel):
 class OptimizerConfig(BaseModel):
     component: str = Field(..., alias='_component_')
     lr: float
+
+
+class LoraConfig(BaseModel):
+    r: Optional[int] = 32
+    lora_alpha: Optional[int] = 16
+    lora_dropout: Optional[float] = 0.0
+    # bias: Optional[str]
+    # target_modules: Optional[list] = []
+    # modules_to_save: Optional[list] = []
+    # use_gradient_checkpointing: Optional[str]
+
+    def export(self):
+        self.dict(exclude_none=True)
 
 
 class LossConfig(BaseModel):
@@ -47,30 +60,32 @@ class Config(BaseModel):
     tokenizer: TokenizerConfig
     model: ModelConfig
     compile: bool = False
+    lora: Optional[LoraConfig] = None
+    unsloth: Optional[bool] = False
 
-    dataset: Union[DatasetConfig, List[DatasetConfig]]
-    seed: Optional[int] = None
-    shuffle: bool = True
-
-    optimizer: OptimizerConfig
-    loss: LossConfig
-    batch_size: int = 2
-    epochs: int = 3
-    max_steps_per_epoch: int | None = None
-    gradient_accumulation_steps: int = 1
-    resume_from_checkpoint: bool = False
-    optimizer_in_bwd: bool = False
+    # dataset: Union[DatasetConfig, List[DatasetConfig]]
+    # seed: Optional[int] = None
+    # shuffle: bool = True
+    #
+    # optimizer: Optional[OptimizerConfig]
+    # loss: Optional[LossConfig]
+    # batch_size: int = 2
+    # epochs: int = 3
+    # max_steps_per_epoch: int | None = None
+    # gradient_accumulation_steps: int = 1
+    # resume_from_checkpoint: bool = False
+    # optimizer_in_bwd: bool = False
 
     device: str = 'cuda'
     enable_activation_checkpointing: bool = True
 
     dtype: str = 'bf16'
 
-    metric_logger: MetricLoggerConfig
-
-    output_dir: str
-    log_every_n_steps: int = 1
-    log_peak_memory_stats: bool = False
+    # metric_logger: Optional[MetricLoggerConfig]
+    #
+    # output_dir: str
+    # log_every_n_steps: int = 1
+    # log_peak_memory_stats: bool = False
 
     def get(self, key: str, default=None):
         return getattr(self, key, default)
