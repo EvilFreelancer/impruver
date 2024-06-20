@@ -1,8 +1,9 @@
-import re
 import logging
-from ruamel.yaml import YAML
-from pydantic import BaseModel, ValidationError, Field
+import re
 from typing import List, Union, Optional
+
+from pydantic import BaseModel, ValidationError, Field
+from ruamel.yaml import YAML
 
 from .utils import get_logger
 
@@ -30,11 +31,6 @@ class DatasetConfig(BaseModel):
 class OptimizerConfig(BaseModel):
     component: str = Field(..., alias='_component_')
     lr: float
-
-    def export(self):
-        attributes = self.dict(exclude={'component'}, by_alias=True)
-        # attributes['lr'] = tensor([attributes['lr']])  # if isinstance(attributes['lr'], float) else attributes['lr']
-        return attributes
 
 
 class LossConfig(BaseModel):

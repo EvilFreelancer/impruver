@@ -1,0 +1,13 @@
+class EvalInterface:
+
+    def load_config(self, config):
+        ...
+
+    def load_checkpoints(self):
+        ...
+
+    def load_datasets(self):
+        ...
+
+    def evaluate(self):
+        ...

@@ -28,6 +28,8 @@ dependencies = [
     "tqdm",
     # Quantization
     "bitsandbytes>=0.43.0",
+    "peft>=0.11.1",
+    "accelerate>=0.31.0"
 ]
 dynamic = ["version"]
 
@@ -36,7 +38,6 @@ impruver = "impruver.cli:main"
 
 [project.optional-dependencies]
 dev = [
-    "bitsandbytes>=0.43.0",
     "flash-attn>=2.5.8",
     "pre-commit",
     "pytest",
