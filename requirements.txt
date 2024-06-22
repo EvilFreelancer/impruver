@@ -1,0 +1,34 @@
+# Core
+fire>=0.6.0
+pydantic>=2.7.3
+ruamel.yaml>=0.18.6
+
+# Hugging Face integrations
+torch>=2.3.1
+datasets>=2.19.2
+transformers>=4.41.2
+huggingface_hub>=0.23.3
+safetensors
+
+# Tokenization
+sentencepiece
+tiktoken
+blobfile>=2
+tokenizers
+
+# Miscellaneous
+tqdm
+
+# Quantization
+bitsandbytes>=0.43.0
+peft>=0.11.1
+accelerate>=0.31.0
+
+# Other
+flash-attn>=2.5.8
+pytest
+pytest-cov
+pytest-mock
+pytest-integration
+wandb
+evaluate

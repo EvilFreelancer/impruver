@@ -1,16 +1,21 @@
 import random
+import logging
+import time
 
 import fire
 import torch
 from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
+    # AutoTokenizer,
+    # AutoModelForCausalLM,
     DataCollatorForTokenClassification,
+    BitsAndBytesConfig,
 )
 
 from impruver.config import Config, log_config
-from impruver.utils import dynamic_import, get_dtype, get_device
+from impruver.utils import dynamic_import, get_dtype, get_device, get_logger
 from recipes._train_interface import TrainInterface
+
+_log: logging.Logger = get_logger()
 
 
 # from transformers import (
@@ -44,38 +49,37 @@ class LoraSingleDevice(TrainInterface):
     def _setup_model_and_tokenizer(self):
         # Load tokenizer
         _tokenizer_cls = dynamic_import(self._config.tokenizer.component)
+        _log.debug(f"Tokenizer class is {_tokenizer_cls}")
         self._tokenizer = _tokenizer_cls.from_pretrained(
             self._config.tokenizer.path
         )
 
+        # If quantization is set, then use it
+        _quantization_config = None
+        if self._config.quantization:
+            _quantization_config = BitsAndBytesConfig(**self._config.quantization.dict())
+            _log.debug(f"Quantization config {_quantization_config}")
+
         # Load model
         _model_cls = dynamic_import(self._config.model.component)
+        _log.debug(f"Model class is {_model_cls}")
         self._model = _model_cls.from_pretrained(
             self._config.model.path,
-            load_in_8bit=self._config.model.load_in_8bit,
-            load_in_4bit=self._config.model.load_in_4bit,
+            quantization_config=_quantization_config,
             torch_dtype=self._dtype,
             attn_implementation=self._config.model.attn_implementation,
-        ).to(self._device)
+        )
 
         # If unsloth training is enabled
-        # if self._config.unsloth:
-        #     from unsloth.models._utils import prepare_model_for_kbit_training
-        #     self._model = prepare_model_for_kbit_training(self._model)
+        if self._config.unsloth:
+            from unsloth.models._utils import prepare_model_for_kbit_training
+            self._model = prepare_model_for_kbit_training(self._model)
 
         # If LoRA training is enabled
         if self._config.lora:
             from peft import get_peft_model, LoraConfig
-
-            print(self._config.lora.export())
-            exit()
-
-            _lora_config = LoraConfig(**self._config.lora.model_dump())
-
-            print(_lora_config)
-            exit()
-
-            self._model = get_peft_model(self._model, lora_config)
+            _lora_config = LoraConfig(**self._config.lora.dict())
+            self._model = get_peft_model(self._model, _lora_config)
 
     def _setup_datasets(self):
         train_file = self._config.dataset.train_file

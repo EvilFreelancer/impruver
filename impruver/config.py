@@ -33,17 +33,28 @@ class OptimizerConfig(BaseModel):
     lr: float
 
 
+class QuantizationConfig(BaseModel):
+    load_in_8bit: Optional[bool] = False
+    load_in_4bit: Optional[bool] = False
+    llm_int8_threshold: Optional[float] = 6.0
+    llm_int8_skip_modules: Optional[str] = None
+    llm_int8_enable_fp32_cpu_offload: Optional[bool] = False
+    llm_int8_has_fp16_weight: Optional[bool] = False
+    bnb_4bit_compute_dtype: Optional[str] = None
+    bnb_4bit_quant_type: Optional[str] = "fp4"
+    bnb_4bit_use_double_quant: Optional[bool] = False
+    bnb_4bit_quant_storage: Optional[str] = None
+
+
 class LoraConfig(BaseModel):
     r: Optional[int] = 32
     lora_alpha: Optional[int] = 16
     lora_dropout: Optional[float] = 0.0
+
     # bias: Optional[str]
     # target_modules: Optional[list] = []
     # modules_to_save: Optional[list] = []
     # use_gradient_checkpointing: Optional[str]
-
-    def export(self):
-        self.dict(exclude_none=True)
 
 
 class LossConfig(BaseModel):
@@ -61,6 +72,7 @@ class Config(BaseModel):
     model: ModelConfig
     compile: bool = False
     lora: Optional[LoraConfig] = None
+    quantization: Optional[QuantizationConfig] = None
     unsloth: Optional[bool] = False
 
     # dataset: Union[DatasetConfig, List[DatasetConfig]]
