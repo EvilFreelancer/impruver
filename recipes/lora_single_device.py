@@ -79,6 +79,7 @@ class LoraSingleDevice(TrainInterface):
         if self._config.lora:
             from peft import get_peft_model, LoraConfig
             _lora_config = LoraConfig(**self._config.lora.dict())
+            _log.debug(f"LoRA config {_lora_config}")
             self._model = get_peft_model(self._model, _lora_config)
 
     def _setup_datasets(self):

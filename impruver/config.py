@@ -1,13 +1,33 @@
 import logging
 import re
-from typing import List, Union, Optional
-
-from pydantic import BaseModel, ValidationError, Field
+from typing import List, Union, Optional, Literal
+import inspect
+from pydantic import BaseModel, ValidationError, Field, create_model
 from ruamel.yaml import YAML
 
 from .utils import get_logger
 
 _log: logging.Logger = get_logger()
+
+
+def optional(*fields):
+    def dec(cls):
+        fields_dict = {}
+        for field in fields:
+            field_info = cls.__annotations__.get(field)
+            if field_info is not None:
+                fields_dict[field] = (Optional[field_info], None)
+        OptionalModel = create_model(cls.__name__, **fields_dict)
+        OptionalModel.__module__ = cls.__module__
+
+        return OptionalModel
+
+    if fields and inspect.isclass(fields[0]) and issubclass(fields[0], BaseModel):
+        cls = fields[0]
+        fields = cls.__annotations__
+        return dec(cls)
+
+    return dec
 
 
 class TokenizerConfig(BaseModel):
@@ -19,8 +39,6 @@ class ModelConfig(BaseModel):
     component: str = Field(..., alias='_component_')
     path: str
     attn_implementation: Optional[str] = None
-    load_in_4bit: bool = False
-    load_in_8bit: bool = False
 
 
 class DatasetConfig(BaseModel):
@@ -47,14 +65,12 @@ class QuantizationConfig(BaseModel):
 
 
 class LoraConfig(BaseModel):
-    r: Optional[int] = 32
-    lora_alpha: Optional[int] = 16
+    r: Optional[int] = 8
+    target_modules: Optional[Union[list[str], str]] = None
+    lora_alpha: Optional[int] = 8
     lora_dropout: Optional[float] = 0.0
-
-    # bias: Optional[str]
-    # target_modules: Optional[list] = []
-    # modules_to_save: Optional[list] = []
-    # use_gradient_checkpointing: Optional[str]
+    bias: Optional[Literal["none", "all", "lora_only"]] = "none"
+    modules_to_save: Optional[list[str]] = None
 
 
 class LossConfig(BaseModel):
@@ -107,6 +123,7 @@ class Config(BaseModel):
         config_data = load_yaml_with_references(path)
         if isinstance(config_data.get('dataset'), dict):
             config_data['dataset'] = [config_data['dataset']]
+        _log.info(config_data)
         return cls(**config_data)
 
     def to_yaml(self, path: Optional[str] = None):
