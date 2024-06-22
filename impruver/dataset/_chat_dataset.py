@@ -68,5 +68,34 @@ class ChatDataset(Dataset):
         input_ids = torch.LongTensor(tokenized_messages)
         labels = torch.LongTensor([self._labels_pad_token_id for _ in range(len(tokenized_messages))])
         attention_mask = input_ids.new_ones(input_ids.size())
-        assert (input_ids.size(0) == labels.size(0) == attention_mask.size(0) <= self._max_tokens_count)
-        return {"input_ids": input_ids, "labels": labels, "attention_mask": attention_mask}
+        # assert (input_ids.size(0) == labels.size(0) == attention_mask.size(0) <= self._max_tokens_count)
+        return {"input_ids": input_ids[0], "labels": labels, "attention_mask": attention_mask[0]}
+
+
+def chat_dataset(
+        *,
+        tokenizer: Tokenizer,
+        source: str,
+        convert_function_name: str = "default",
+        chat_format_name: str = "default",
+        max_tokens_count: Optional[int] = None,
+        **load_dataset_kwargs: Dict[str, Any],
+) -> ChatDataset:
+    if convert_function_name == "default":
+        convert_function = lambda x: [Message.from_dict(m) for m in x["messages"]]
+    else:
+        raise ValueError(f"convert_function {convert_function_name} is not supported")
+
+    if chat_format_name == "default":
+        chat_format = None
+    else:
+        raise ValueError(f"convert_function {convert_function_name} is not supported")
+
+    return ChatDataset(
+        tokenizer=tokenizer,
+        source=source,
+        convert_function=convert_function,
+        chat_format=chat_format,
+        max_tokens_count=max_tokens_count,
+        **load_dataset_kwargs
+    )

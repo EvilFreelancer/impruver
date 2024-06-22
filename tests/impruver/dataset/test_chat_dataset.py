@@ -19,10 +19,6 @@ class TestChatDataset(unittest.TestCase):
         ]
 
         self.convert_function = lambda x: [Message.from_dict(m) for m in x["messages"]]
-
-        print(self.convert_function)
-        exit()
-
         self.dataset = ChatDataset(
             tokenizer=self.tokenizer,
             source="json",

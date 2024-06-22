@@ -43,7 +43,9 @@ class ModelConfig(BaseModel):
 
 class DatasetConfig(BaseModel):
     component: str = Field(..., alias='_component_')
-    train_on_input: bool
+    source: Optional[str] = None
+    split: Optional[str] = None
+    max_tokens_count: Optional[int] = None
 
 
 class OptimizerConfig(BaseModel):
@@ -83,18 +85,41 @@ class MetricLoggerConfig(BaseModel):
     filename: Optional[str] = None
 
 
+class TrainerConfig(BaseModel):
+    eval_strategy: str = "steps"
+    per_device_train_batch_size: int = 1
+    per_device_eval_batch_size: int = 1
+    gradient_accumulation_steps: int = 128
+    eval_steps: int = 8
+    save_steps: int = 8
+    logging_steps: int = 1
+    learning_rate: float = 0.00005
+    num_train_epochs: int = 2
+    lr_scheduler_type: str = "cosine"
+    warmup_steps: int = 8
+    bf16: bool = False
+    fp16: bool = False
+    optim: str = "adamw_8bit"
+    load_best_model_at_end: bool = True
+    save_total_limit: int = 1
+    seed: int = 42
+    max_grad_norm: float = 1.0
+    weight_decay: float = 0.05
+
+
 class Config(BaseModel):
     tokenizer: TokenizerConfig
     model: ModelConfig
     compile: bool = False
     lora: Optional[LoraConfig] = None
     quantization: Optional[QuantizationConfig] = None
-    unsloth: Optional[bool] = False
+    # unsloth: Optional[bool] = False
 
-    # dataset: Union[DatasetConfig, List[DatasetConfig]]
-    # seed: Optional[int] = None
-    # shuffle: bool = True
-    #
+    dataset: List[DatasetConfig]
+    seed: Optional[int] = None
+    shuffle: bool = False
+
+    trainer: Optional[TrainerConfig] = None
     # optimizer: Optional[OptimizerConfig]
     # loss: Optional[LossConfig]
     # batch_size: int = 2
@@ -110,8 +135,8 @@ class Config(BaseModel):
     dtype: str = 'bf16'
 
     # metric_logger: Optional[MetricLoggerConfig]
-    #
-    # output_dir: str
+    output_dir: Optional[str] = None
+
     # log_every_n_steps: int = 1
     # log_peak_memory_stats: bool = False
 

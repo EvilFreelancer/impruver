@@ -9,26 +9,15 @@ from transformers import (
     # AutoModelForCausalLM,
     DataCollatorForTokenClassification,
     BitsAndBytesConfig,
+    Trainer,
+    TrainingArguments,
 )
 
 from impruver.config import Config, log_config
-from impruver.utils import dynamic_import, get_dtype, get_device, get_logger
+from impruver.utils import dynamic_import, get_dtype, get_device, get_logger, set_seed
 from recipes._train_interface import TrainInterface
 
 _log: logging.Logger = get_logger()
-
-
-# from transformers import (
-#     Trainer,
-#     TrainingArguments,
-#     logging,
-#     TrainerCallback,
-#     TrainerState,
-#     TrainerControl,
-#     BitsAndBytesConfig,
-# )
-# from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
-# from unsloth.models._utils import prepare_model_for_kbit_training
 
 
 class LoraSingleDevice(TrainInterface):
@@ -37,6 +26,7 @@ class LoraSingleDevice(TrainInterface):
     _model = None
     _tokenizer = None
     _config: Config
+    _dataset = []
 
     def __init__(self, cfg: Config):
         # Setup configuration
@@ -57,6 +47,9 @@ class LoraSingleDevice(TrainInterface):
         # If quantization is set, then use it
         _quantization_config = None
         if self._config.quantization:
+            if self._config.quantization.bnb_4bit_compute_dtype is not None:
+                self._config.quantization.bnb_4bit_compute_dtype = get_dtype(
+                    self._config.quantization.bnb_4bit_compute_dtype)
             _quantization_config = BitsAndBytesConfig(**self._config.quantization.dict())
             _log.debug(f"Quantization config {_quantization_config}")
 
@@ -71,9 +64,9 @@ class LoraSingleDevice(TrainInterface):
         )
 
         # If unsloth training is enabled
-        if self._config.unsloth:
-            from unsloth.models._utils import prepare_model_for_kbit_training
-            self._model = prepare_model_for_kbit_training(self._model)
+        # if self._config.unsloth:
+        #     from unsloth.models._utils import prepare_model_for_kbit_training
+        #     self._model = prepare_model_for_kbit_training(self._model)
 
         # If LoRA training is enabled
         if self._config.lora:
@@ -83,45 +76,53 @@ class LoraSingleDevice(TrainInterface):
             self._model = get_peft_model(self._model, _lora_config)
 
     def _setup_datasets(self):
-        train_file = self._config.dataset.train_file
-        val_file = self._config.dataset.val_file
-        max_tokens_count = self._config.dataset.max_tokens_count
-        only_target_loss = self._config.dataset.only_target_loss
-        sample_rate = self._config.dataset.sample_rate
+        if self._config.seed is not None:
+            set_seed(self._config.seed)
 
-        # train_records = read_jsonl(train_file)
-        # val_records = read_jsonl(val_file)
-        # random.shuffle(train_records)
-        #
-        # datasets = []
-        # for records in (train_records, val_records):
-        #     datasets.append(
-        #         ChatDataset(
-        #             records,
-        #             self._tokenizer,
-        #             max_tokens_count=max_tokens_count,
-        #             sample_rate=sample_rate,
-        #             only_target_loss=only_target_loss,
-        #         )
-        #     )
-        # self._train_dataset, self._val_dataset = datasets
-        # self._data_collator = DataCollatorForTokenClassification(self._tokenizer, pad_to_multiple_of=8)
+        for _dataset in self._config.dataset:
+            _dataset_cls = dynamic_import(_dataset.component)
+            # TODO: need to support of multiple datasets
+            self._dataset = _dataset_cls(
+                tokenizer=self._tokenizer,
+                source=_dataset.source,
+                split=_dataset.split,
+            )
+
+        self._data_collator = DataCollatorForTokenClassification(self._tokenizer, pad_to_multiple_of=8)
 
     def setup(self):
         self._setup_model_and_tokenizer()
-        # self._setup_datasets()
+        self._setup_datasets()
 
-    # def train(self):
-    #     ...
-    #     # Last step is config saving
-    #     # self.save_checkpoint()
-    #
-    # def cleanup(self):
-    #     ...
-    #
-    # def save_checkpoint(self):
-    #     self._model.save_pretrained(self._config.output_dir)
-    #     self._tokenizer.save_pretrained(self._config.output_dir)
+    def train(self):
+        _trainer_config = self._config.trainer.dict()
+        _training_args = TrainingArguments(
+            output_dir=self._config.output_dir,
+            report_to="none",
+            **_trainer_config
+        )
+
+        # print(_training_args)
+        # exit()
+
+        trainer = Trainer(
+            model=self._model,
+            args=_training_args,
+            train_dataset=self._dataset,
+            data_collator=self._data_collator,
+        )
+
+        # if trainer_config.get("report_to", "wandb") == "wandb":
+        #     wandb.init(project="rulm_self_instruct", name=config_file)
+
+        trainer.train()
+
+        # Last step is config saving
+        self.save_checkpoint()
+
+    def save_checkpoint(self):
+        self._model.save_pretrained(self._config.output_dir)
+        self._tokenizer.save_pretrained(self._config.output_dir)
 
 
 def recipe_main(cfg: str) -> None:
@@ -130,7 +131,7 @@ def recipe_main(cfg: str) -> None:
 
     recipe = LoraSingleDevice(cfg=config)
     recipe.setup()
-    # recipe.train()
+    recipe.train()
     # recipe.cleanup()
 
 
