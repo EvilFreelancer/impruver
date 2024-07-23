@@ -28,7 +28,7 @@ def validate_messages(messages: List[Message]) -> None:
 
     last_turn = "assistant"
     for i, message in enumerate(messages):
-        if message.role == "assistant" and last_turn != "user":
+        if message.role == "assistant" and last_turn != "user" and last_turn != "system":
             raise ValueError(
                 f"Assistant message before expected user message at index {i} in messages"
             )

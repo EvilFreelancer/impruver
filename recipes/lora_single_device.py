@@ -4,6 +4,7 @@ import time
 
 import fire
 import torch
+from torch.utils.data import DataLoader, random_split
 from transformers import (
     # AutoTokenizer,
     # AutoModelForCausalLM,
@@ -27,6 +28,8 @@ class LoraSingleDevice(TrainInterface):
     _tokenizer = None
     _config: Config
     _dataset = []
+    _train_dataset = []
+    _eval_dataset = []
 
     def __init__(self, cfg: Config):
         # Setup configuration
@@ -75,10 +78,14 @@ class LoraSingleDevice(TrainInterface):
             _log.debug(f"LoRA config {_lora_config}")
             self._model = get_peft_model(self._model, _lora_config)
 
+        # Switch to train mode after all
+        self._model.train()
+
     def _setup_datasets(self):
         if self._config.seed is not None:
             set_seed(self._config.seed)
 
+        _dataset_filtered = []
         for _dataset in self._config.dataset:
             _dataset_cls = dynamic_import(_dataset.component)
             # TODO: need to support of multiple datasets
@@ -88,10 +95,22 @@ class LoraSingleDevice(TrainInterface):
                 split=_dataset.split,
             )
 
+        # Let's skip all Nones
+        self._dataset = [item for item in self._dataset if item is not None]
+
+        # Calculate sizes
+        train_size = int(0.8 * len(self._dataset))
+        eval_size = len(self._dataset) - train_size
+
+        # Split datasets train and eval
+        self._train_dataset, self._eval_dataset = random_split(self._dataset, [train_size, eval_size])
+
+    def _setup_datas_collator(self):
         self._data_collator = DataCollatorForTokenClassification(self._tokenizer, pad_to_multiple_of=8)
 
     def setup(self):
         self._setup_model_and_tokenizer()
+        self._setup_datas_collator()
         self._setup_datasets()
 
     def train(self):
@@ -102,13 +121,11 @@ class LoraSingleDevice(TrainInterface):
             **_trainer_config
         )
 
-        # print(_training_args)
-        # exit()
-
         trainer = Trainer(
             model=self._model,
             args=_training_args,
-            train_dataset=self._dataset,
+            train_dataset=self._train_dataset,
+            eval_dataset=self._eval_dataset,
             data_collator=self._data_collator,
         )
 

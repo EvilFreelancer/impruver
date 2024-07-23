@@ -54,7 +54,9 @@ def last_message_by_assistant(
             # Remove the last message if total tokens exceed the limit
             messages.pop()
 
-    raise ValueError(
+    _log.info(
         "Unable to fit messages within the maximum token length "
         "with the last message being from the assistant."
     )
+
+    return messages, None, None

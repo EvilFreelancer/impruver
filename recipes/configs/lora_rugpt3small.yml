@@ -7,7 +7,8 @@ tokenizer:
 dataset:
   - _component_: impruver.dataset.chat_dataset
     source: IlyaGusev/saiga_scored
-    split: train
+    split: train[:1000]
+    max_tokens_count: 1024
 seed: 42
 shuffle: True
 
@@ -29,19 +30,19 @@ trainer:
   evaluation_strategy: "steps"
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
-  gradient_accumulation_steps: 16
+  gradient_accumulation_steps: 2
   optim: "paged_adamw_8bit"
 
 # Model quantization settings
 quantization:
   load_in_4bit: True
-  bnb_4bit_compute_dtype: fp16
+  bnb_4bit_compute_dtype: bf16
 
 # Reduced precision
 dtype: fp16
 
 # Training env
-device: cpu
+device: "0"
 
 # Result and Logging
 output_dir: ./models/lora_rugpt3small
