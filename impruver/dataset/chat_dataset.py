@@ -63,7 +63,6 @@ class ChatDataset(Dataset):
             tokens = apply_chat_template(
                 messages,
                 chat_template=self.chat_template,
-                # add_special_tokens=False,
                 tokenize=True,
                 add_generation_prompt=False,
                 tokenizer=self.tokenizer,
@@ -86,60 +85,71 @@ class ChatDataset(Dataset):
                 chat_template=self.chat_template,
             )
 
-        # messages should be a list of dicts with "role" and "content"
+        # Tokenize the entire conversation
+        input_ids = self.get_tokens(messages)
+        if len(input_ids) > self.max_tokens_count - 2:
+            input_ids = input_ids[: self.max_tokens_count - 2]
 
-        input_ids, labels = [], []
+        labels = [self.labels_pad_token_id] * len(input_ids)
 
-        for message in messages:
-            message_input_ids = self.get_tokens([message])
-            message_labels = message_input_ids
-            if len(input_ids) + len(message_input_ids) > self.max_tokens_count - 2:
-                break
+        # Find the last assistant message
+        assistant_indices = [
+            idx for idx, msg in enumerate(messages) if msg["role"] in ("assistant", "bot", "gpt")
+        ]
+        if assistant_indices:
+            last_assistant_idx = assistant_indices[-1]
 
-            labels_mask = [self.labels_pad_token_id for _ in range(len(message_input_ids))]
+            # Tokenize messages up to and including the last assistant message
+            tokens_up_to_last_assistant = self.get_tokens(messages[: last_assistant_idx + 1])
 
-            if message["role"] not in ("assistant", "bot", "gpt") and self.only_target_loss:
-                message_labels = labels_mask
+            # Tokenize the last assistant message
+            last_assistant_tokens = self.get_tokens([messages[last_assistant_idx]])
 
-            input_ids.extend(message_input_ids)
-            labels.extend(message_labels)
+            # Calculate start and end indices of the last assistant's message in tokens
+            start_idx = len(tokens_up_to_last_assistant) - len(last_assistant_tokens)
+            end_idx = len(tokens_up_to_last_assistant)
 
-        if not input_ids:
-            return None
+            # Adjust indices if truncated
+            if end_idx > len(labels):
+                end_idx = len(labels)
+            if start_idx < 0:
+                start_idx = 0
 
-        original_input_ids = self.get_tokens(messages)
-        assert input_ids == original_input_ids[: len(input_ids)], f"{input_ids} vs {original_input_ids}"
+            # Set labels for the last assistant's message
+            labels[start_idx:end_idx] = input_ids[start_idx:end_idx]
 
+        # Add global BOS and EOS tokens if specified
         if self.add_global_bos and input_ids[0] != self.tokenizer.bos_token_id:
-            input_ids.insert(0, self.tokenizer.bos_token_id)
-            labels.insert(0, self.labels_pad_token_id)
-
-        if input_ids[-2] == self.tokenizer.eos_token_id:
-            input_ids = input_ids[:-1]
-            labels = labels[:-1]
+            input_ids = [self.tokenizer.bos_token_id] + input_ids
+            labels = [self.labels_pad_token_id] + labels
 
         if self.add_global_eos and input_ids[-1] != self.tokenizer.eos_token_id:
             input_ids.append(self.tokenizer.eos_token_id)
             labels.append(self.tokenizer.eos_token_id)
 
-        if not self.is_printed:
-            print(input_ids)
-            print(labels)
-            print(
-                "Full prompt:",
-                self.tokenizer.decode(input_ids, skip_special_tokens=False),
-            )
-            self.is_printed = True
-
+        # Convert to tensors
         input_ids = torch.LongTensor(input_ids)
         labels = torch.LongTensor(labels)
-        attention_mask = input_ids.new_ones(input_ids.size())
+        attention_mask = torch.ones_like(input_ids)
+
+        # Ensure lengths are consistent
         assert (
                 input_ids.size(0)
                 == labels.size(0)
                 == attention_mask.size(0)
                 <= self.max_tokens_count
         )
+
+        # Print sample once for verification
+        if not self.is_printed:
+            print("Input IDs:", input_ids)
+            print("Labels:", labels)
+            print(
+                "Full prompt:",
+                self.tokenizer.decode(input_ids, skip_special_tokens=False),
+            )
+            self.is_printed = True
+
         return {
             "input_ids": input_ids,
             "labels": labels,
