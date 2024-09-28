@@ -1,8 +1,9 @@
 import random
 import torch
 from torch.utils.data import Dataset
-from typing import List, Dict, Callable, Optional, Any
+from typing import List, Dict, Callable, Optional
 from tqdm import tqdm
+from transformers import AutoTokenizer
 
 from impruver.data import apply_chat_template
 
@@ -33,7 +34,7 @@ class ChatDataset(Dataset):
         self.convert_function = convert_function
         self.strategy_function = strategy_function
         self.chat_template = chat_template
-        self.is_printed = False
+        self.is_printed = True
 
         self.records = []
         for record in tqdm(original_records):
@@ -51,7 +52,7 @@ class ChatDataset(Dataset):
         return self.records[index]
 
     def get_tokens(self, messages):
-        if hasattr(self.tokenizer, 'apply_chat_template'):
+        if hasattr(self.tokenizer, 'apply_chat_template') and hasattr(self.tokenizer, 'chat_template') and self.tokenizer.chat_template is not None:
             tokens = self.tokenizer.apply_chat_template(
                 messages,
                 chat_template=self.chat_template,
@@ -68,8 +69,10 @@ class ChatDataset(Dataset):
                 add_generation_prompt=False,
                 tokenizer=self.tokenizer,
             )
-        if tokens[0] == self.tokenizer.bos_token_id:
-            tokens = tokens[1:]
+
+        if int(tokens[0][0]) == self.tokenizer.bos_token_id:
+            tokens = tokens[0][1:]
+
         return tokens
 
     def convert_record(self, record):
@@ -93,22 +96,20 @@ class ChatDataset(Dataset):
 
         labels = [self.labels_pad_token_id] * len(input_ids)
 
-        # Find the last assistant message
-        assistant_indices = [
-            idx for idx, msg in enumerate(messages) if msg["role"] in ("assistant", "bot", "gpt")
-        ]
-        if assistant_indices:
-            last_assistant_idx = assistant_indices[-1]
+        # Find the last message in conversation
+        last_indices = [idx for idx, msg in enumerate(messages)]
+        if last_indices:
+            last_idx = last_indices[-1]
 
-            # Tokenize messages up to and including the last assistant message
-            tokens_up_to_last_assistant = self.get_tokens(messages[: last_assistant_idx + 1])
+            # Tokenize messages including the last message
+            tokens_up_to_last = self.get_tokens(messages[: last_idx + 1])
 
-            # Tokenize the last assistant message
-            last_assistant_tokens = self.get_tokens([messages[last_assistant_idx]])
+            # Tokenize the last message
+            last_tokens = self.get_tokens([messages[last_idx]])
 
             # Calculate start and end indices of the last assistant's message in tokens
-            start_idx = len(tokens_up_to_last_assistant) - len(last_assistant_tokens)
-            end_idx = len(tokens_up_to_last_assistant)
+            start_idx = len(tokens_up_to_last) - len(last_tokens)
+            end_idx = len(tokens_up_to_last)
 
             # Adjust indices if truncated
             if end_idx > len(labels):
@@ -116,17 +117,17 @@ class ChatDataset(Dataset):
             if start_idx < 0:
                 start_idx = 0
 
-            # Set labels for the last assistant's message
+            # Set labels for the last message
             labels[start_idx:end_idx] = input_ids[start_idx:end_idx]
 
         # Add global BOS and EOS tokens if specified
         if self.add_global_bos and input_ids[0] != self.tokenizer.bos_token_id:
-            input_ids = [self.tokenizer.bos_token_id] + input_ids
+            input_ids = torch.cat((torch.tensor([self.tokenizer.bos_token_id]), input_ids), dim=-1)
             labels = [self.labels_pad_token_id] + labels
 
         if self.add_global_eos and input_ids[-1] != self.tokenizer.eos_token_id:
-            input_ids.append(self.tokenizer.eos_token_id)
-            labels.append(self.tokenizer.eos_token_id)
+            input_ids = torch.cat((input_ids, torch.tensor([self.tokenizer.eos_token_id])), dim=-1)
+            labels += [self.tokenizer.eos_token_id]
 
         # Convert to tensors
         input_ids = torch.LongTensor(input_ids)
@@ -145,7 +146,7 @@ class ChatDataset(Dataset):
         if not self.is_printed:
             print("Input IDs:", input_ids)
             print("Labels:", labels)
-            print("Fll prompt:", self.tokenizer.decode(input_ids.tolist(), skip_special_tokens=False))
+            print("Full prompt:", self.tokenizer.decode(input_ids.tolist(), skip_special_tokens=False))
             self.is_printed = True
 
         return {
@@ -153,3 +154,25 @@ class ChatDataset(Dataset):
             "labels": labels,
             "attention_mask": attention_mask,
         }
+
+
+if __name__ == '__main__':
+    records = [
+        {
+            "messages": [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": "Hello, how are you?"},
+                {"role": "assistant", "content": "I'm doing great!"},
+                {"role": "user", "content": "Can you help me with something?"},
+                {"role": "assistant", "content": "Sure, what do you need help with?"}
+            ]
+        }
+    ]
+    tokenizer = AutoTokenizer.from_pretrained('gpt2')
+    dataset = ChatDataset(
+        original_records=records,
+        tokenizer=tokenizer,
+        max_tokens_count=1024,
+    )
+
+    print(dataset[0])

@@ -18,7 +18,7 @@ DEFAULT_CHAT_TEMPLATE = (
 
 
 def apply_chat_template(
-        conversation: List[Message],
+        conversation: List[dict],
         chat_template: Optional[str] = None,
         add_special_tokens: bool = False,
         add_generation_prompt: Optional[bool] = False,
@@ -31,7 +31,7 @@ def apply_chat_template(
 
     # Prepare the context for the template
     context = {
-        'messages': [{'role': msg.role, 'content': msg.content} for msg in conversation],
+        'messages': [{'role': msg['role'], 'content': msg['content']} for msg in conversation],
         'add_generation_prompt': add_generation_prompt,
         'bos_token': tokenizer.bos_token if tokenizer else ''
     }
