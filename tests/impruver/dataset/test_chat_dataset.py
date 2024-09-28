@@ -6,7 +6,7 @@ from transformers import AutoTokenizer
 from impruver.utils import get_logger
 from impruver.data._strategies import last_message_by_assistant
 from impruver.data._message import Message
-from impruver.dataset._chat_dataset import ChatDataset
+from impruver.dataset.chat_dataset import ChatDataset
 
 _log: logging.Logger = get_logger()
 
@@ -53,6 +53,18 @@ class TestChatDataset(unittest.TestCase):
         self.assertIsInstance(sample["attention_mask"], torch.Tensor)
 
     def test_strategy_function(self):
+        # messages_filtered = [
+        #   Message(role='system', content='You are a helpful assistant 111'),
+        #   Message(role='user', content='Hello, how are you?'),
+        #   Message(role='assistant', content="I'm doing great!")
+        # ]  # 3 of 5 messages in set was filtered by to strategy
+
+        messages_filtered_ids = [
+            50256, 10057, 25, 921, 389, 257, 7613, 8796, 13374, 198,
+            7220, 25, 18435, 11, 703, 389, 345, 30, 198, 562,
+            10167, 25, 314, 1101, 1804, 1049, 0, 198, 50256
+        ]
+
         dataset = ChatDataset(
             tokenizer=self.tokenizer,
             source="json",
@@ -60,27 +72,11 @@ class TestChatDataset(unittest.TestCase):
             convert_function=self.convert_function,
             chat_template=self.chat_template,
             strategy_function=last_message_by_assistant,
-            max_tokens_count=1024,
+            max_tokens_count=30,
             data_files="tests/impruver/dataset/_test.jsonl",
         )
         sample = dataset[0]
-        messages = self.convert_function({"messages": self.messages})
-
-        _, _, tokenized_messages = last_message_by_assistant(
-            tokenizer=self.tokenizer,
-            messages=messages,
-            max_tokens_count=1024,
-            chat_template=self.chat_template
-        )
-
-        self.assertEqual(sample["input_ids"].tolist(), tokenized_messages[0].tolist())
-
-    # TODO: ValueError: Messages must be at least length 2, but got 0 messages
-    # def test_prepare_sample_edge_case(self):
-    #     sample = self.dataset._prepare_sample({"messages": []})
-    #     self.assertEqual(sample["input_ids"].size(0), 0)
-    #     self.assertEqual(sample["labels"].size(0), 0)
-    #     self.assertEqual(sample["attention_mask"].size(0), 0)
+        self.assertEqual(sample["input_ids"].tolist(), messages_filtered_ids)
 
 
 if __name__ == "__main__":

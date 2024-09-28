@@ -13,22 +13,23 @@ def last_message_by_assistant(
         messages: List[Message],
         max_tokens_count: int,
         chat_template: Optional[str] = None,
-) -> (List[Message], List[str]):
+) -> List[Message]:
     _log.debug(f"Max tokens count: {max_tokens_count}")
-    while messages:
+    tmp_messages = messages.copy()
+    while tmp_messages:
 
         # Apply chat format from template
         if hasattr(tokenizer, 'apply_chat_template'):
             # On modern tokenizers we may use chat_template
             formated_messages = tokenizer.apply_chat_template(
-                messages,
+                tmp_messages,
                 chat_template=chat_template,  # Use default_chat_template if None
                 tokenize=False
             )
         else:
             # On old tokenizers we will use a custom apply_chat_template
             formated_messages = apply_chat_template(
-                messages,
+                tmp_messages,
                 chat_template=chat_template,  # Use DEFAULT_CHAT_TEMPLATE if None
                 tokenize=False,
                 tokenizer=tokenizer
@@ -44,19 +45,19 @@ def last_message_by_assistant(
         # If total tokens pass the limit
         if total_tokens <= max_tokens_count:
             # If last message is from the assistant
-            if messages[-1].role == 'assistant':
+            if tmp_messages[-1].role == 'assistant':
                 # Return the messages, formated and tokenized they versions
-                return messages, formated_messages, tokenized_messages
+                return tmp_messages
             else:
                 # Remove the last message, then try again
-                messages.pop()
+                tmp_messages.pop()
         else:
             # Remove the last message if total tokens exceed the limit
-            messages.pop()
+            tmp_messages.pop()
 
     _log.info(
         "Unable to fit messages within the maximum token length "
         "with the last message being from the assistant."
     )
 
-    return messages, None, None
+    return messages
