@@ -34,7 +34,7 @@ trainer:
   eval_steps: 16
   save_steps: 16
   logging_steps: 1
-  learning_rate: 0.001
+  learning_rate: 0.00001
   num_train_epochs: 2
   lr_scheduler_type: cosine
   warmup_steps: 16

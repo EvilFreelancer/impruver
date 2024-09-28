@@ -48,6 +48,8 @@ def compose_dataset(config_path: str, train_path: str, val_path: str):
             only_target_loss=only_target_loss
         )
 
+        # TODO: multithread
+
         train_records = []
         val_records = []
         for record in chat_dataset:
