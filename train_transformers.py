@@ -2,6 +2,7 @@ import random
 import json
 import fire
 import wandb
+import os
 import yaml
 import torch
 from transformers import (
@@ -28,6 +29,8 @@ def train(
         report_to: str = None,  # "wandb",
         seed: int = 42,
 ):
+    os.environ["WANDB_DISABLED"] = "true"
+
     set_seed(seed)
     logging.set_verbosity_info()
     with open(config_file, "r") as r:
