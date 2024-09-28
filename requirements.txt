@@ -1,20 +1,29 @@
 # Core
 pydantic>=2.9.2
+pyyaml>=6.0.2
+jsonlines>=4.0.0
+
 # Hugging Face integrations
 torch>=2.4.1
 datasets>=3.0.1
 transformers>=4.45.1
 huggingface-hub>=0.25.1
 safetensors>=0.4.5
+zstandard>=0.23.0
+
 # Tokenization
 tokenizers>=0.20.0
+
 # Miscellaneous
 tqdm>=4.66.5
+
 # Quantization
 bitsandbytes>=0.44.0
 peft>=0.13.0
 accelerate>=0.34.2
+
 # Other
 flash-attn>=2.6.3, --global-option=--no-build-isolation
 wandb>=0.18.2
 tiktoken>=0.7.0
+mmh3>=5.0.1

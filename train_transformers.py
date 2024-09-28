@@ -1,48 +1,37 @@
 import random
 import json
-import os
-
 import fire
 import wandb
+import yaml
 import torch
-import numpy as np
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
     DataCollatorForTokenClassification,
-    AutoConfig,
 )
 from transformers import (
     Trainer,
     TrainingArguments,
     logging,
-    TrainerCallback,
-    TrainerState,
-    TrainerControl,
-    BitsAndBytesConfig,
 )
-from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
 from peft import get_peft_model, LoraConfig
-# from unsloth.models._utils import prepare_model_for_kbit_training
 
-from src.dataset import ChatDataset
-from src.util.dl import set_random_seed
-from src.util.io import read_jsonl
+from impruver.dataset import ChatDataset
+from impruver.utils import set_seed, read_jsonl
 
 
 def train(
-    config_file: str,
-    train_file: str,
-    val_file: str,
-    output_dir: str,
-    sample_rate: float = 1.0,
-    report_to: str = "wandb",
-    seed: int = 42,
+        config_file: str,
+        train_file: str,
+        val_file: str,
+        output_dir: str,
+        report_to: str = None,  # "wandb",
+        seed: int = 42,
 ):
-    set_random_seed(seed)
+    set_seed(seed)
     logging.set_verbosity_info()
     with open(config_file, "r") as r:
-        config = json.load(r)
+        config = yaml.safe_load(r)
 
     trainer_config = config.get("trainer")
     lora_config = config.get("lora")
@@ -50,8 +39,8 @@ def train(
         output_dir=output_dir, report_to=report_to, **trainer_config
     )
 
-    model_name = config["model_name"]
-    tokenizer_name = config.get("tokenizer_name", model_name)
+    model_name = config["model"]["name"]
+    tokenizer_name = config.get("tokenizer.name", model_name)
 
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     tokenizer.save_pretrained(output_dir)
@@ -59,23 +48,9 @@ def train(
     train_records = read_jsonl(train_file)
     val_records = read_jsonl(val_file)
     random.shuffle(train_records)
-    print(train_records[0])
 
-    only_target_loss = config.get("only_target_loss", True)
-    max_tokens_count = config["max_tokens_count"]
-
-    train_dataset = ChatDataset(
-        train_records, tokenizer,
-        max_tokens_count=max_tokens_count,
-        sample_rate=sample_rate,
-        only_target_loss=only_target_loss
-    )
-    val_dataset = ChatDataset(
-        val_records, tokenizer,
-        max_tokens_count=max_tokens_count,
-        sample_rate=sample_rate,
-        only_target_loss=only_target_loss
-    )
+    train_dataset = train_records
+    val_dataset = val_records
 
     data_collator = DataCollatorForTokenClassification(tokenizer, pad_to_multiple_of=8)
 
@@ -96,7 +71,6 @@ def train(
         torch_dtype=torch.bfloat16,
         attn_implementation="flash_attention_2",
     )
-    # model = prepare_model_for_kbit_training(model)
 
     if lora_config:
         lora_config = LoraConfig(**lora_config)
@@ -110,8 +84,8 @@ def train(
         data_collator=data_collator,
     )
 
-    if trainer_config.get("report_to", "wandb") == "wandb":
-        wandb.init(project="rulm_self_instruct", name=config_file)
+    # if trainer_config.get("report_to", "wandb") == "wandb":
+    #     wandb.init(project="rulm_self_instruct", name=config_file)
 
     trainer.train()
     model.save_pretrained(output_dir)

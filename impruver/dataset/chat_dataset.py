@@ -150,9 +150,9 @@ class ChatDataset(Dataset):
             self.is_printed = True
 
         return {
-            "input_ids": input_ids,
-            "labels": labels,
-            "attention_mask": attention_mask,
+            "input_ids": input_ids.tolist(),
+            "labels": labels.tolist(),
+            "attention_mask": attention_mask.tolist(),
         }
 
 

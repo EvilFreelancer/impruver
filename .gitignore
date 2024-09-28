@@ -4,3 +4,5 @@
 /build/
 /*.yaml
 __pycache__
+/output/
+/*.jsonl

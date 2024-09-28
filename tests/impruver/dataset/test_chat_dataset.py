@@ -1,10 +1,9 @@
 import unittest
 import torch
-from typing import List, Dict, Any
 from transformers import AutoTokenizer
 
 from impruver.dataset import ChatDataset
-from impruver.data import apply_chat_template, Message
+from impruver.data import apply_chat_template
 
 
 # Now, we write the test class using unittest.TestCase

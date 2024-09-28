@@ -1,0 +1,49 @@
+datasets:
+  - name: mahiatlinux/Reflection-Dataset-ShareGPT-v2
+    #class: impruver.dataset.chat_dataset
+    # Max tokens in single conversation
+    max_tokens_count: 2048
+    split: train[:1000]
+    sample_rate: 1.0
+
+model:
+  name: ai-forever/rugpt3small_based_on_gpt2
+  load_in_8bit: false
+  load_in_4bit: true
+
+#lora:
+#  r: 32
+#  lora_alpha: 16
+#  lora_dropout: 0.0
+#  bias: none
+#  target_modules: [ c_attn, c_proj, c_fc ]
+#  modules_to_save: [ lm_head ]
+
+tokenizer:
+  name: ai-forever/rugpt3small_based_on_gpt2
+  max_tokens_count: 2048
+  bos_token: <s>
+  eos_token: </s>
+  pad_token: <pad>
+
+trainer:
+  evaluation_strategy: steps
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 64
+  eval_steps: 16
+  save_steps: 16
+  logging_steps: 1
+  learning_rate: 0.00002
+  num_train_epochs: 2
+  lr_scheduler_type: cosine
+  warmup_steps: 16
+  bf16: false
+  fp16: true
+  optim: paged_adamw_8bit
+  load_best_model_at_end: true
+  save_total_limit: 2
+  seed: 42
+  remove_unused_columns: false
+  max_grad_norm: 1.0
+  weight_decay: 0.08
