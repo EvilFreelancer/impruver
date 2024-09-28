@@ -71,7 +71,7 @@ def train(
         load_in_8bit=load_in_8bit,
         load_in_4bit=load_in_4bit,
         device_map="auto",
-        torch_dtype=torch.bfloat16,
+        torch_dtype=torch.float16, # todo: configurable
         attn_implementation="flash_attention_2",
     )
 
