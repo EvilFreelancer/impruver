@@ -20,6 +20,7 @@ DEFAULT_CHAT_TEMPLATE = (
 def apply_chat_template(
         conversation: List[Message],
         chat_template: Optional[str] = None,
+        add_special_tokens: bool = False,
         add_generation_prompt: Optional[bool] = False,
         tokenize: bool = True,
         tokenizer=None
@@ -37,6 +38,10 @@ def apply_chat_template(
 
     # Render the template
     rendered = template.render(context).strip()
+
+    # Add begin and end of text tokens
+    if add_special_tokens:
+        rendered = "<|startoftext|>" + rendered + "<|endoftext|>"
 
     if tokenize and tokenizer:
         # Tokenize the rendered text

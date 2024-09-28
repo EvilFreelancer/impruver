@@ -16,4 +16,5 @@ peft>=0.13.0
 accelerate>=0.34.2
 # Other
 flash-attn>=2.6.3, --global-option=--no-build-isolation
-wandb
+wandb>=0.18.2
+tiktoken>=0.7.0

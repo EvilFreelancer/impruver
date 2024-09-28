@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 from impruver.data import apply_chat_template
 
+
 class ChatDataset(Dataset):
     def __init__(
             self,
@@ -144,10 +145,7 @@ class ChatDataset(Dataset):
         if not self.is_printed:
             print("Input IDs:", input_ids)
             print("Labels:", labels)
-            print(
-                "Full prompt:",
-                self.tokenizer.decode(input_ids, skip_special_tokens=False),
-            )
+            print("Fll prompt:", self.tokenizer.decode(input_ids.tolist(), skip_special_tokens=False))
             self.is_printed = True
 
         return {
