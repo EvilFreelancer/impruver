@@ -27,13 +27,13 @@ pip install .
 Далее собираем датасет:
 
 ```shell
-python3 compose_dataset.py configs/rugpt3small_based_on_gpt2.yaml ./tr.jsonl ./val.jsonl
+python3 compose_dataset.py configs/rugpt3small_full.yaml
 ```
 
 Запускаем обучение модели:
 
 ```shell
-python3 train_transformers.py configs/rugpt3small_based_on_gpt2.yaml ./tr.jsonl ./val.jsonl ./output
+python3 train_transformers.py configs/rugpt3small_full.yaml
 ```
 
 ---

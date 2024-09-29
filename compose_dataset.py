@@ -10,7 +10,7 @@ from impruver.data import conversations_to_messages
 from impruver.dataset import ChatDataset
 
 
-def compose_dataset(config_path: str, train_path: str, val_path: str):
+def compose_dataset(config_path: str, train_path: str = None, val_path: str = None):
     # Load the config file
     with open(config_path, "r") as r:
         config = yaml.safe_load(r)
@@ -54,10 +54,14 @@ def compose_dataset(config_path: str, train_path: str, val_path: str):
             else:
                 val_records.append(record)
 
+        if train_path is not None:
+            train_path = config['train_path']
         with open(train_path, "w") as w:
             for record in train_records:
                 w.write(json.dumps(record, ensure_ascii=False).strip() + "\n")
 
+        if val_path is not None:
+            val_path = config['val_path']
         with open(val_path, "w") as w:
             for record in val_records:
                 w.write(json.dumps(record, ensure_ascii=False).strip() + "\n")

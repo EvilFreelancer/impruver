@@ -13,9 +13,9 @@ from impruver.utils import set_seed, read_jsonl, get_dtype, dynamic_import
 
 def train(
         config_file: str,
-        train_file: str,
-        val_file: str,
-        output_dir: str,
+        train_path: str = None,
+        val_path: str = None,
+        output_dir: str = None,
         report_to: str = "none",
         seed: int = 42,
 ):
@@ -29,6 +29,16 @@ def train(
     # Read config from disk
     with open(config_file, "r") as r:
         config = yaml.safe_load(r)
+
+    # Get paths to train and validation sets
+    if train_path is not None:
+        train_path = config['train_path']
+    if val_path is not None:
+        val_path = config['val_path']
+
+    # Path where model will be saved
+    if output_dir is not None:
+        output_dir = config['output_dir']
 
     # Get settings of trainer object
     trainer_config = config.get("trainer", {})
@@ -81,8 +91,8 @@ def train(
     #
 
     # Read train and evaluation datasets form JSONL
-    train_dataset = read_jsonl(train_file)
-    val_dataset = read_jsonl(val_file)
+    train_dataset = read_jsonl(train_path)
+    val_dataset = read_jsonl(val_path)
 
     # Randomize order of items in train dataset
     random.shuffle(train_dataset)
