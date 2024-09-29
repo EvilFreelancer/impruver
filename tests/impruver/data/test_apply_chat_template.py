@@ -2,7 +2,7 @@ import torch
 import unittest
 from transformers import AutoTokenizer
 
-from impruver.data._message import Message
+from impruver.data.message import Message
 from impruver.data.apply_chat_template import apply_chat_template
 
 

@@ -10,7 +10,7 @@
 {"conversation":[{"from":"human","value":"text"},{"from":"gpt","value":"text"}]}
 ```
 
-А класс ChatDataset может работать только со следующей стрктурой данных:
+А класс `ChatDataset` может работать только со следующей структурой данных:
 
 ```json lines
 {"messages":[{"role":"user","value":"text"},{"role":"assistant","value":"text"}]}
@@ -36,7 +36,7 @@ def convert_function(conversation: dict) -> list:
     return messages
 ```
 
-Передав такую функцию в конструктор ChatDataset мы можем быть спокойны за то, что данные будут в правильном формате.
+Передав такую функцию в конструктор `ChatDataset` мы можем быть спокойны за то, что данные будут в правильном формате.
 
 ```python
 from datasets import load_dataset

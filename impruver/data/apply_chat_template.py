@@ -1,6 +1,5 @@
 from typing import Optional, List, Union, Dict
 from jinja2 import Template
-from impruver.data._message import Message
 
 DEFAULT_CHAT_TEMPLATE = (
     "{% set loop_messages = messages %}"
@@ -25,6 +24,21 @@ def apply_chat_template(
         tokenize: bool = True,
         tokenizer=None
 ) -> Union[List[int], Dict, str]:
+    """
+    Apply a chat template to a conversation in GPT2 sample format.
+
+    Args:
+        conversation: List[dict] - The conversation to apply the template to.
+        chat_template: Optional[str] - The Jinja2 template to apply to the conversation. Defaults to None.
+        add_special_tokens: bool - Whether to add begin and end of text tokens. Defaults to False.
+        add_generation_prompt: Optional[bool] - Whether to add generation prompt. Defaults to False.
+        tokenize: bool - Whether to tokenize the rendered text. Defaults to True.
+        tokenizer: Optional[Tokenizer] - The tokenizer to use. Defaults to None.
+
+    Returns:
+        Union[List[int], Dict, str]: The rendered text.
+    """
+
     # Use provided chat template or default template
     template_str = chat_template if chat_template else DEFAULT_CHAT_TEMPLATE
     template = Template(template_str)

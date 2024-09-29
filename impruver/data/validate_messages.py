@@ -1,6 +1,6 @@
 from typing import List
 
-from ._message import Message
+from .message import Message
 
 
 def validate_messages(messages: List[Message]) -> None:

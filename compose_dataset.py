@@ -6,20 +6,8 @@ import json
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
+from impruver.data import conversations_to_messages
 from impruver.dataset import ChatDataset
-
-
-def convert_function(conversation: dict) -> list:
-    messages = []
-    for item in conversation['conversations']:
-        content = item['value']
-        role = 'assistant'
-        if item['from'] == 'human':
-            role = 'user'
-        if item['from'] == 'gpt':
-            role = 'assistant'
-        messages.append({"role": role, "content": content})
-    return messages
 
 
 def compose_dataset(config_path: str, train_path: str, val_path: str):
@@ -50,17 +38,17 @@ def compose_dataset(config_path: str, train_path: str, val_path: str):
         chat_dataset = ChatDataset(
             original_records=list(hf_dataset),
             tokenizer=tokenizer,
-            convert_function=convert_function,
+            convert_function=conversations_to_messages,
             max_tokens_count=dataset.get("max_tokens_count", max_tokens_count),
         )
 
-        # TODO: multithread
-
+        # Save splits
         train_records = []
         val_records = []
         for record in chat_dataset:
             string = str(record)
             hash = mmh3.hash(string, signed=False)
+            print(hash)
             if hash % 100 < 97:
                 train_records.append(record)
             else:

@@ -1,11 +1,11 @@
 import logging
 from typing import List, Optional
-from impruver.data._message import Message
-from impruver.data._tokenizer import Tokenizer
+from impruver.data.message import Message
+from impruver.data.tokenizer import Tokenizer
 from impruver.data.apply_chat_template import apply_chat_template
 from impruver.utils.get_logger import get_logger
 
-_log: logging.Logger = get_logger("DEBUG")
+_log: logging.Logger = get_logger()
 
 
 def last_message_by_assistant(
@@ -14,6 +14,13 @@ def last_message_by_assistant(
         max_tokens_count: int,
         chat_template: Optional[str] = None,
 ) -> List[Message]:
+    """
+    Return the last message by assistant.
+
+    If there is no message by assistant, return the first message.
+    If there is more than one message by assistant, return the last one.
+    """
+
     _log.debug(f"Max tokens count: {max_tokens_count}")
     tmp_messages = messages.copy()
     while tmp_messages:
@@ -55,7 +62,7 @@ def last_message_by_assistant(
             # Remove the last message if total tokens exceed the limit
             tmp_messages.pop()
 
-    _log.info(
+    _log.error(
         "Unable to fit messages within the maximum token length "
         "with the last message being from the assistant."
     )

@@ -1,7 +1,7 @@
 import unittest
 from transformers import AutoTokenizer
-from impruver.data._message import Message
-from impruver.data._strategies import last_message_by_assistant
+from impruver.data.message import Message
+from impruver.data.strategies import last_message_by_assistant
 
 
 class TestStrategies(unittest.TestCase):
