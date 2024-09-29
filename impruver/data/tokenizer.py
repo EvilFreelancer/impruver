@@ -10,6 +10,10 @@ class Tokenizer(Protocol):
     eos_token_id: int
     pad_token_id: int
 
+    bos_token: str
+    eos_token: str
+    pad_token: str
+
     # Tokens indicating that generation should stop
     stop_tokens: Set[int]
 

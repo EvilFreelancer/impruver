@@ -19,6 +19,15 @@ def last_message_by_assistant(
 
     If there is no message by assistant, return the first message.
     If there is more than one message by assistant, return the last one.
+
+    Args:
+        tokenizer (Tokenizer): Tokenizer object
+        messages (List[Message]): List of Message objects
+        max_tokens_count (int): Max tokens count
+        chat_template (Optional[str]): The Jinja2 template to apply to the conversation. Defaults to None.
+
+    Returns:
+        List[Message]: List of Message objects
     """
 
     _log.debug(f"Max tokens count: {max_tokens_count}")

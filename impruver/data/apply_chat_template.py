@@ -1,6 +1,8 @@
 from typing import Optional, List, Union, Dict
 from jinja2 import Template
 
+from .tokenizer import Tokenizer
+
 DEFAULT_CHAT_TEMPLATE = (
     "{% set loop_messages = messages %}"
         "{% for message in loop_messages %}"
@@ -22,18 +24,18 @@ def apply_chat_template(
         add_special_tokens: bool = False,
         add_generation_prompt: Optional[bool] = False,
         tokenize: bool = True,
-        tokenizer=None
+        tokenizer: Tokenizer = None
 ) -> Union[List[int], Dict, str]:
     """
     Apply a chat template to a conversation in GPT2 sample format.
 
     Args:
-        conversation: List[dict] - The conversation to apply the template to.
-        chat_template: Optional[str] - The Jinja2 template to apply to the conversation. Defaults to None.
-        add_special_tokens: bool - Whether to add begin and end of text tokens. Defaults to False.
-        add_generation_prompt: Optional[bool] - Whether to add generation prompt. Defaults to False.
-        tokenize: bool - Whether to tokenize the rendered text. Defaults to True.
-        tokenizer: Optional[Tokenizer] - The tokenizer to use. Defaults to None.
+        conversation (List[dict]): The conversation to apply the template to.
+        chat_template (Optional[str]): The Jinja2 template to apply to the conversation. Defaults to None.
+        add_special_tokens (bool): Whether to add begin and end of text tokens. Defaults to False.
+        add_generation_prompt (Optional[bool]): Whether to add generation prompt. Defaults to False.
+        tokenize (bool): Whether to tokenize the rendered text. Defaults to True.
+        tokenizer (Optional[Tokenizer]): The tokenizer to use. Defaults to None.
 
     Returns:
         Union[List[int], Dict, str]: The rendered text.

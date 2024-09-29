@@ -23,16 +23,13 @@
 Пример реализации:
 
 ```python
-def convert_function(conversation: dict) -> list:
+def conversations_to_messages(conversation: dict) -> list:
     messages = []
     for item in conversation['conversations']:
-        content = item['value']
-        role = 'assistant'
-        if item['from'] == 'human':
-            role = 'user'
-        if item['from'] == 'gpt':
-            role = 'assistant'
-        messages.append({"role": role, "content": content})
+        messages.append({
+            "role": 'user' if item['from'] == 'human' else 'assistant',
+            "content": item['value']
+        })
     return messages
 ```
 
@@ -47,13 +44,14 @@ from impruver.dataset import ChatDataset
 tokenizer = AutoTokenizer.from_pretrained("gpt2")
 
 # Скачиваем датасет с данными в кривом формате
+# https://huggingface.co/datasets/mahiatlinux/Reflection-Dataset-ShareGPT-v2
 hf_dataset = load_dataset('mahiatlinux/Reflection-Dataset-ShareGPT-v2', split='train')
 
 # Инициализируем класс ChatDataset передав в него функцию конвертации
 chat_dataset = ChatDataset(
     original_records=list(hf_dataset),
     tokenizer=tokenizer,
-    convert_function=convert_function,
+    convert_function=conversations_to_messages,
     max_tokens_count=1024
 )
 ```
