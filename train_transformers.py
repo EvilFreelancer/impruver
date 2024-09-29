@@ -2,6 +2,7 @@ import os
 import random
 import fire
 import yaml
+from pathlib import Path
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorForTokenClassification
@@ -39,6 +40,7 @@ def train(
     # Path where model will be saved
     if output_dir is not None:
         output_dir = config['output_dir']
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     # Get settings of trainer object
     trainer_config = config.get("trainer", {})
