@@ -12,32 +12,33 @@ model:
   name: ai-forever/ruGPT-3.5-13B
   load_in_4bit: true
   load_in_8bit: false
-  dtype: fp16
+  dtype: bf16
 
 lora:
-  r: 32
+  r: 16
   lora_alpha: 16
-  lora_dropout: 0.0
+  lora_dropout: 0.05
   bias: none
-  target_modules: [ c_attn, c_proj, c_fc ]
-  modules_to_save: [ lm_head ]
+  target_modules: [ c_attn ]
+  task_type: CAUSAL_LM
 
 tokenizer:
   class: transformers.AutoTokenizer
   name: ai-forever/ruGPT-3.5-13B
+  max_tokens_count: 2000
 
 trainer:
   eval_strategy: epoch
   save_strategy: epoch
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
-  gradient_accumulation_steps: 64
+  gradient_accumulation_steps: 128
   logging_steps: 1
-  learning_rate: 0.00002
+  learning_rate: 0.0003
   num_train_epochs: 2
   lr_scheduler_type: cosine
-  warmup_steps: 16
-  optim: paged_adamw_8bit
+  warmup_steps: 30
+  optim: adamw_torch
   metric_for_best_model: eval_loss
   load_best_model_at_end: true
   save_total_limit: 2
@@ -45,6 +46,7 @@ trainer:
   remove_unused_columns: false
   max_grad_norm: 1.0
   weight_decay: 0.08
+  torch_compile: false
 
 #ddp:
 #  ddp_find_unused_parameters: false
