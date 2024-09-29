@@ -8,7 +8,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorForTok
 from transformers import Trainer, TrainingArguments, logging, BitsAndBytesConfig
 from peft import get_peft_model, LoraConfig
 
-from impruver.utils import set_seed, read_jsonl, get_dtype
+from impruver.utils import set_seed, read_jsonl, get_dtype, dynamic_import
 
 
 def train(
@@ -16,12 +16,11 @@ def train(
         train_file: str,
         val_file: str,
         output_dir: str,
-        report_to: str = None,
+        report_to: str = "none",
         seed: int = 42,
 ):
     set_seed(seed)
     logging.set_verbosity_info()
-    os.environ["WANDB_DISABLED"] = "true"
 
     #
     # Load configuration
@@ -37,8 +36,18 @@ def train(
     # Get settings of Peft/LoRA adapter
     lora_config = config.get("lora")
 
+    # Class to work with Tokenizer
+    model_class = "transformers.AutoModelForCausalLM"
+    if "class" in config["model"]:
+        model_class = config["model"]["class"]
+
     # Read repo_id of model or path to model weights on disk
     model_name = config["model"]["name"]
+
+    # Class to work with Tokenizer
+    tokenizer_class = "transformers.AutoTokenizer"
+    if "class" in config["tokenizer"]:
+        tokenizer_class = config["tokenizer"]["class"]
 
     # Read repo_id of tokenizer or path to configs on disk#
     tokenizer_name = model_name
@@ -58,7 +67,8 @@ def train(
     #
 
     # Init tokenizer object
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    tokenizer_obj = dynamic_import(tokenizer_class)
+    tokenizer = tokenizer_obj.from_pretrained(tokenizer_name)
 
     # Save tokenizer object with all configs to an output folder
     tokenizer.save_pretrained(output_dir)
@@ -107,7 +117,8 @@ def train(
         attn_implementation = config["model"]["attn_implementation"]
 
     # Init model object
-    model = AutoModelForCausalLM.from_pretrained(
+    model_obj = dynamic_import(model_class)
+    model = model_obj.from_pretrained(
         model_name,
         quantization_config=quantization_config,
         device_map="auto",
@@ -141,6 +152,7 @@ def train(
     )
 
     # If reporting to W&B is enabled
+    os.environ["WANDB_DISABLED"] = "true"
     if trainer_config.get("report_to", None) == "wandb":
         import wandb
         os.environ["WANDB_DISABLED"] = "false"
