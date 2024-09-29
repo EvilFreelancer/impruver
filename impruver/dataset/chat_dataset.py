@@ -15,7 +15,6 @@ class ChatDataset(Dataset):
             tokenizer,
             max_tokens_count: int,
             sample_rate: float = 1.0,
-            only_target_loss: bool = True,
             add_global_bos: bool = True,
             add_global_eos: bool = True,
             labels_pad_token_id: int = -100,
@@ -27,7 +26,6 @@ class ChatDataset(Dataset):
         self.sample_rate = sample_rate
         self.tokenizer = tokenizer
         self.max_tokens_count = max_tokens_count
-        self.only_target_loss = only_target_loss
         self.labels_pad_token_id = labels_pad_token_id
         self.add_global_bos = add_global_bos
         self.add_global_eos = add_global_eos
@@ -52,7 +50,11 @@ class ChatDataset(Dataset):
         return self.records[index]
 
     def get_tokens(self, messages):
-        if hasattr(self.tokenizer, 'apply_chat_template') and hasattr(self.tokenizer, 'chat_template') and self.tokenizer.chat_template is not None:
+        if (
+                hasattr(self.tokenizer, 'apply_chat_template')
+                and hasattr(self.tokenizer, 'chat_template')
+                and self.tokenizer.chat_template is not None
+        ):
             tokens = self.tokenizer.apply_chat_template(
                 messages,
                 chat_template=self.chat_template,

@@ -30,7 +30,6 @@ def compose_dataset(config_path: str, train_path: str, val_path: str):
     tokenizer = AutoTokenizer.from_pretrained(config['tokenizer']['name'])
 
     # Settings
-    only_target_loss = config.get("only_target_loss", True)
     max_tokens_count = config['tokenizer']["max_tokens_count"]  # todo: switch
 
     # For each dataset in the config...
@@ -45,7 +44,6 @@ def compose_dataset(config_path: str, train_path: str, val_path: str):
             max_tokens_count=dataset['max_tokens_count'],
             convert_function=convert_function,
             sample_rate=dataset['sample_rate'],
-            only_target_loss=only_target_loss
         )
 
         # TODO: multithread
