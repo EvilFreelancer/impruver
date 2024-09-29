@@ -15,6 +15,12 @@ def compose_dataset(config_path: str, train_path: str = None, val_path: str = No
     with open(config_path, "r") as r:
         config = yaml.safe_load(r)
 
+    # Get paths to train and validation sets
+    if train_path is None:
+        train_path = config['train_path']
+    if val_path is None:
+        val_path = config['val_path']
+
     # Get tokenizer
     tokenizer = AutoTokenizer.from_pretrained(config['tokenizer']['name'])
 
@@ -48,20 +54,15 @@ def compose_dataset(config_path: str, train_path: str = None, val_path: str = No
         for record in chat_dataset:
             string = str(record)
             hash = mmh3.hash(string, signed=False)
-            print(hash)
             if hash % 100 < 97:
                 train_records.append(record)
             else:
                 val_records.append(record)
 
-        if train_path is not None:
-            train_path = config['train_path']
         with open(train_path, "w") as w:
             for record in train_records:
                 w.write(json.dumps(record, ensure_ascii=False).strip() + "\n")
 
-        if val_path is not None:
-            val_path = config['val_path']
         with open(val_path, "w") as w:
             for record in val_records:
                 w.write(json.dumps(record, ensure_ascii=False).strip() + "\n")
