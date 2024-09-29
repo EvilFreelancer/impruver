@@ -31,7 +31,7 @@ def train(
         config = yaml.safe_load(r)
 
     # Get settings of trainer object
-    trainer_config = config.get("trainer")
+    trainer_config = config.get("trainer", {})
 
     # Get settings of Peft/LoRA adapter
     lora_config = config.get("lora")
@@ -61,6 +61,9 @@ def train(
     load_in_8bit = False
     if "load_in_8bit" in config["model"]:
         load_in_8bit = bool(config["model"]["load_in_8bit"])
+
+    # Get ddp settings from config if available
+    ddp_config = config.get("ddp", {})
 
     #
     # Tokenizer preparation
@@ -121,7 +124,7 @@ def train(
     model = model_obj.from_pretrained(
         model_name,
         quantization_config=quantization_config,
-        device_map="auto",
+        device_map=None if ddp_config else "auto", # need to be disabled for DDP
         torch_dtype=dtype,
         attn_implementation=attn_implementation,
     )
@@ -135,11 +138,15 @@ def train(
     # Trainer
     #
 
+    # Merge trainer_config and ddp_config
+    training_args_dict = trainer_config.copy()
+    training_args_dict.update(ddp_config)
+
     # Prepare trainer configuration
     training_args = TrainingArguments(
         output_dir=output_dir,
         report_to=report_to,
-        **trainer_config
+        **training_args_dict
     )
 
     # Init trainer object and pass all important parameters to it
