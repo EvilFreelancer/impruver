@@ -5,10 +5,10 @@ import yaml
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorForTokenClassification
-from transformers import Trainer, TrainingArguments, logging
+from transformers import Trainer, TrainingArguments, logging, BitsAndBytesConfig
 from peft import get_peft_model, LoraConfig
 
-from impruver.utils import set_seed, read_jsonl
+from impruver.utils import set_seed, read_jsonl, get_dtype
 
 
 def train(
@@ -16,7 +16,7 @@ def train(
         train_file: str,
         val_file: str,
         output_dir: str,
-        report_to: str = None,  # "wandb",
+        report_to: str = None,
         seed: int = 42,
 ):
     set_seed(seed)
@@ -38,14 +38,20 @@ def train(
     lora_config = config.get("lora")
 
     # Read repo_id of model or path to model weights on disk
-    model_name = config.get("model.name")
+    model_name = config["model"]["name"]
 
     # Read repo_id of tokenizer or path to configs on disk#
-    tokenizer_name = config.get("tokenizer.name", model_name)
+    tokenizer_name = model_name
+    if "name" in config["tokenizer"]:
+        tokenizer_name = config["tokenizer"]["name"]
 
     # Settings related to bitsandbytes and useful only with LoRA adapter training
-    load_in_8bit = bool(config.get("load_in_8bit", False))
-    load_in_4bit = bool(config.get("load_in_4bit", False))
+    load_in_4bit = False
+    if "load_in_4bit" in config["model"]:
+        load_in_4bit = bool(config["model"]["load_in_4bit"])
+    load_in_8bit = False
+    if "load_in_8bit" in config["model"]:
+        load_in_8bit = bool(config["model"]["load_in_8bit"])
 
     #
     # Tokenizer preparation
@@ -53,14 +59,6 @@ def train(
 
     # Init tokenizer object
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-
-    # If special tokens is set, then replace defaults
-    if config.get("tokenizer.pad_token", None):
-        tokenizer.pad_token = config["pad_token"]
-    if config.get("tokenizer.eos_token", None):
-        tokenizer.pad_token = config["eos_token"]
-    if config.get("tokenizer.bos_token", None):
-        tokenizer.pad_token = config["bos_token"]
 
     # Save tokenizer object with all configs to an output folder
     tokenizer.save_pretrained(output_dir)
@@ -83,13 +81,38 @@ def train(
     # Model preparation
     #
 
+    # Data Type is bfloat16 by default
+    dtype = torch.bfloat16
+    if "dtype" in config["model"]:
+        dtype = get_dtype(config["model"]["dtype"])
+
+    # Quantization related settings, can be used only in combination with LoRA adapter
+    quantization_config = None
+    if load_in_4bit:
+        quantization_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=dtype,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True
+        )
+    if load_in_8bit:
+        quantization_config = BitsAndBytesConfig(
+            load_in_8bit=True,
+            llm_int8_threshold=6.0,
+        )
+
+    # Attention implementation
+    attn_implementation = None
+    if "attn_implementation" in config["model"]:
+        attn_implementation = config["model"]["attn_implementation"]
+
+    # Init model object
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        load_in_8bit=load_in_8bit,
-        load_in_4bit=load_in_4bit,
+        quantization_config=quantization_config,
         device_map="auto",
-        torch_dtype=torch.float16,  # todo: configurable
-        attn_implementation="flash_attention_2",
+        torch_dtype=dtype,
+        attn_implementation=attn_implementation,
     )
 
     # If we need to train a LoRA adapter
@@ -133,7 +156,7 @@ def train(
     # Saving results
     #
 
-    model.save_pretrained(output_dir)
+    model.save_pretrained(output_dir, safe_serialization=False)
 
 
 if __name__ == "__main__":

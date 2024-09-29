@@ -1,35 +1,34 @@
 datasets:
   - name: mahiatlinux/Reflection-Dataset-ShareGPT-v2
-    #class: impruver.dataset.chat_dataset
-    # Max tokens in single conversation
-    max_tokens_count: 2048
+    # Name of split, you may limit these split like train[:1000] - this mean first 1000 items from train string
     split: train
+    # Max tokens per single conversation
+    max_tokens_count: 2048
 
 model:
   name: ai-forever/rugpt3small_based_on_gpt2
-  load_in_8bit: false
-  load_in_4bit: true
+  load_in_4bit: false
+  load_in_8bit: true
+  dtype: fp16
+  # attn_implementation: flash_attention_2
 
-#lora:
-#  r: 32
-#  lora_alpha: 16
-#  lora_dropout: 0.0
-#  bias: none
-#  target_modules: [ c_attn, c_proj, c_fc ]
-#  modules_to_save: [ lm_head ]
+lora:
+  r: 32
+  lora_alpha: 16
+  lora_dropout: 0.0
+  bias: none
+  target_modules: [ c_attn, c_proj, c_fc ]
+  modules_to_save: [ lm_head ]
 
 tokenizer:
   name: ai-forever/rugpt3small_based_on_gpt2
   max_tokens_count: 2048
-  bos_token: <s>
-  eos_token: </s>
-  pad_token: <pad>
 
 trainer:
   evaluation_strategy: steps
-  per_device_train_batch_size: 8
-  per_device_eval_batch_size: 8
-  gradient_accumulation_steps: 128
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 64
   eval_steps: 16
   save_steps: 16
   logging_steps: 1
