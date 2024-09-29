@@ -3,9 +3,12 @@ import torch
 from torch.utils.data import Dataset
 from typing import List, Dict, Callable, Optional
 from tqdm import tqdm
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, logging
 
 from impruver.data import apply_chat_template
+
+_log = logging.get_logger()
+logging.set_verbosity_info()
 
 
 class ChatDataset(Dataset):
@@ -94,8 +97,11 @@ class ChatDataset(Dataset):
         # Tokenize the entire conversation
         input_ids = self.get_tokens(messages)
         if len(input_ids) > self.max_tokens_count - 2:
-            input_ids = input_ids[: self.max_tokens_count - 2]
+            # If length of conversation is larger than allowed then skip this sample
+            _log.info(f'Input is "{len(input_ids)}" tokens, max allowed is "{self.max_tokens_count}" tokens, skip...')
+            return None
 
+        # Create list of labels with same size as input_ids list
         labels = [self.labels_pad_token_id] * len(input_ids)
 
         # Find the last message in conversation

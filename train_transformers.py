@@ -1,22 +1,13 @@
-import random
-import json
-import fire
 import os
+import random
+import fire
 import yaml
+
 import torch
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    DataCollatorForTokenClassification,
-)
-from transformers import (
-    Trainer,
-    TrainingArguments,
-    logging,
-)
+from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorForTokenClassification
+from transformers import Trainer, TrainingArguments, logging
 from peft import get_peft_model, LoraConfig
 
-from impruver.dataset import ChatDataset
 from impruver.utils import set_seed, read_jsonl
 
 
@@ -126,6 +117,7 @@ def train(
         data_collator=data_collator,
     )
 
+    # If reporting to W&B is enabled
     if trainer_config.get("report_to", None) == "wandb":
         import wandb
         os.environ["WANDB_DISABLED"] = "false"

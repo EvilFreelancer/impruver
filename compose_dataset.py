@@ -1,3 +1,5 @@
+from time import sleep
+
 import yaml
 import mmh3
 import fire
@@ -29,21 +31,29 @@ def compose_dataset(config_path: str, train_path: str, val_path: str):
     # Get tokenizer
     tokenizer = AutoTokenizer.from_pretrained(config['tokenizer']['name'])
 
-    # Settings
-    max_tokens_count = config['tokenizer']["max_tokens_count"]  # todo: switch
+    # Default max_tokens_count from tokenizer
+    max_tokens_count = tokenizer.model_max_length
+
+    # If max_tokens_count was replaced in config, then overwrite it
+    if 'max_tokens_count' in config['tokenizer']:
+        max_tokens_count = config['tokenizer']['max_tokens_count']
+
+    # Prevent automatic truncation by setting model_max_length to a large value
+    tokenizer.model_max_length = int(1e30)  # Disable automatic truncation
 
     # For each dataset in the config...
     for dataset in config['datasets']:
+
         # Load the actual dataset from Hugging Face's datasets library.
         hf_dataset = load_dataset(dataset['name'], split=dataset['split'])
 
-        # ... create an instance of ChatDataset
+        # Create an instance of ChatDataset
         chat_dataset = ChatDataset(
             original_records=list(hf_dataset),
             tokenizer=tokenizer,
-            max_tokens_count=dataset['max_tokens_count'],
             convert_function=convert_function,
-            sample_rate=dataset['sample_rate'],
+            max_tokens_count=dataset.get("max_tokens_count", max_tokens_count),
+            sample_rate=float(dataset.get("sample_rate", 1.0)),
         )
 
         # TODO: multithread
