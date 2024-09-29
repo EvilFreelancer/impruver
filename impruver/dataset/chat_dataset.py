@@ -1,7 +1,5 @@
 from typing import List, Dict, Callable, Optional
 from tqdm import tqdm
-import concurrent.futures
-import threading
 
 import torch
 from torch.utils.data import Dataset

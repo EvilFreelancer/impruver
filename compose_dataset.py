@@ -1,9 +1,8 @@
-from time import sleep
-
 import yaml
 import mmh3
 import fire
 import json
+
 from datasets import load_dataset
 from transformers import AutoTokenizer
 

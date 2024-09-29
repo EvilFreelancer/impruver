@@ -1,8 +1,8 @@
 datasets:
   - name: mahiatlinux/Reflection-Dataset-ShareGPT-v2
-    # Name of split, you may limit these split like train[:1000] - this mean first 1000 items from train string
-    split: train
-    # Max tokens per single conversation
+    # Name of split in dataset
+    split: train # you may limit these split like train[:1000] - this mean get first 1000 elements from train split
+    # Max tokens per single conversation (dataset level)
     max_tokens_count: 2048
 
 model:
@@ -22,6 +22,7 @@ lora:
 
 tokenizer:
   name: ai-forever/rugpt3small_based_on_gpt2
+  # Max tokens per single conversation (tokenizer level)
   max_tokens_count: 2048
 
 trainer:
