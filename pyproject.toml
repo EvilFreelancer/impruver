@@ -14,7 +14,6 @@ dependencies = [
     "pyyaml>=6.0.2",
     "jsonlines>=4.0.0",
     "fire>=0.6.0",
-    "joblib>=1.4.2",
     # Hugging Face integrations
     "torch>=2.4.1",
     "datasets>=3.0.1",
