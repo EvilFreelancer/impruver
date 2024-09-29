@@ -1,4 +1,4 @@
-# convert_function
+# converter
 
 Функция конвертации отдельного элемента необходима для того, чтобы привести все входящие данные к общему виду.
 
@@ -51,7 +51,7 @@ hf_dataset = load_dataset('mahiatlinux/Reflection-Dataset-ShareGPT-v2', split='t
 chat_dataset = ChatDataset(
     original_records=list(hf_dataset),
     tokenizer=tokenizer,
-    convert_function=conversations_to_messages,
+    converter=conversations_to_messages,
     max_tokens_count=1024
 )
 ```

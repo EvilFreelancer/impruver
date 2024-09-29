@@ -3,9 +3,15 @@ train_path: ./train.jsonl
 val_path: ./val.jsonl
 
 datasets:
-  - class: transformers.AutoModelForCausalLM
-    name: mahiatlinux/Reflection-Dataset-ShareGPT-v2
-    split: train
+  - name: IlyaGusev/ru_turbo_alpaca
+    converter: impruver.data.instruction_to_messages
+  - name: IlyaGusev/ru_turbo_alpaca_evol_instruct
+    converter: impruver.data.instruction_to_messages
+  - name: IlyaGusev/ru_turbo_saiga
+    converter: impruver.data.dialog_to_messages
+#  - name: IlyaGusev/ru_sharegpt_cleaned
+#    converter: impruver.data.dialog_to_messages
+
 
 model:
   class: transformers.AutoModelForCausalLM
@@ -25,7 +31,7 @@ lora:
 tokenizer:
   class: transformers.AutoTokenizer
   name: ai-forever/ruGPT-3.5-13B
-  max_tokens_count: 2000
+  max_tokens_count: 1024
 
 trainer:
   eval_strategy: epoch

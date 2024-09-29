@@ -20,7 +20,7 @@ class ChatDataset(Dataset):
             add_global_bos: bool = True,
             add_global_eos: bool = True,
             labels_pad_token_id: int = -100,
-            convert_function: Optional[Callable[[Dict], List[Dict]]] = None,
+            converter: Optional[Callable[[Dict], List[Dict]]] = None,
             strategy_function: Optional[Callable[[List[Dict]], List[Dict]]] = None,
             chat_template: Optional[str] = None,
     ):
@@ -30,7 +30,7 @@ class ChatDataset(Dataset):
         self.labels_pad_token_id = labels_pad_token_id
         self.add_global_bos = add_global_bos
         self.add_global_eos = add_global_eos
-        self.convert_function = convert_function
+        self.converter = converter
         self.strategy_function = strategy_function
         self.chat_template = chat_template
         self.is_printed = True
@@ -77,10 +77,14 @@ class ChatDataset(Dataset):
         return tokens
 
     def convert_record(self, record):
-        if self.convert_function:
-            messages = self.convert_function(record)
+        if self.converter:
+            messages = self.converter(record)
         else:
             messages = record["messages"]
+
+        # Ig sample is empty, then we don't need it
+        if messages is None:
+            return None
 
         if self.strategy_function:
             messages = self.strategy_function(
