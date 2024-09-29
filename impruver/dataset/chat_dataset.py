@@ -1,8 +1,8 @@
-import random
 import torch
 from torch.utils.data import Dataset
 from typing import List, Dict, Callable, Optional
 from tqdm import tqdm
+from joblib import Parallel, delayed
 from transformers import AutoTokenizer, logging
 
 from impruver.data import apply_chat_template
@@ -17,16 +17,15 @@ class ChatDataset(Dataset):
             original_records: List[Dict],
             tokenizer,
             max_tokens_count: int,
-            sample_rate: float = 1.0,
             add_global_bos: bool = True,
             add_global_eos: bool = True,
             labels_pad_token_id: int = -100,
             convert_function: Optional[Callable[[Dict], List[Dict]]] = None,
             strategy_function: Optional[Callable[[List[Dict]], List[Dict]]] = None,
             chat_template: Optional[str] = None,
+            n_jobs: int = 12,
     ):
         self.original_records = original_records
-        self.sample_rate = sample_rate
         self.tokenizer = tokenizer
         self.max_tokens_count = max_tokens_count
         self.labels_pad_token_id = labels_pad_token_id
@@ -37,14 +36,14 @@ class ChatDataset(Dataset):
         self.chat_template = chat_template
         self.is_printed = True
 
-        self.records = []
-        for record in tqdm(original_records):
-            if random.random() > self.sample_rate:
-                continue
-            tensors = self.convert_record(record)
-            if tensors is None:
-                continue
-            self.records.append(tensors)
+        # Use joblib.Parallel to process records in parallel
+        self.records = Parallel(n_jobs=n_jobs)(
+            delayed(self.convert_record)(record)
+            for record in tqdm(original_records)
+        )
+
+        # Filter out None results
+        self.records = [r for r in self.records if r is not None]
 
     def __len__(self):
         return len(self.records)

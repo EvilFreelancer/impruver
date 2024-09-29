@@ -3,8 +3,7 @@ datasets:
     #class: impruver.dataset.chat_dataset
     # Max tokens in single conversation
     max_tokens_count: 2048
-    split: train[:25]
-    sample_rate: 1.0
+    split: train
 
 model:
   name: ai-forever/rugpt3small_based_on_gpt2

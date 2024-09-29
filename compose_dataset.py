@@ -53,7 +53,6 @@ def compose_dataset(config_path: str, train_path: str, val_path: str):
             tokenizer=tokenizer,
             convert_function=convert_function,
             max_tokens_count=dataset.get("max_tokens_count", max_tokens_count),
-            sample_rate=float(dataset.get("sample_rate", 1.0)),
         )
 
         # TODO: multithread
