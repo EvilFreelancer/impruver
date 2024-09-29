@@ -1,5 +1,5 @@
 output_dir: ./models/ruGPT35_13B_lora
-train_path: /train.jsonl
+train_path: ./train.jsonl
 val_path: ./val.jsonl
 
 datasets:

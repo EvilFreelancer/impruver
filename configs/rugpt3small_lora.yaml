@@ -1,6 +1,6 @@
 output_dir: ./models/rugpt3small_lora
-train_dataset: /train.jsonl
-val_dataset: ./val.jsonl
+train_path: ./train.jsonl
+val_path: ./val.jsonl
 
 datasets:
   - class: transformers.AutoModelForCausalLM
