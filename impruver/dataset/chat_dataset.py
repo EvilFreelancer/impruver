@@ -23,6 +23,7 @@ class ChatDataset(Dataset):
             converter: Optional[Callable[[Dict], List[Dict]]] = None,
             strategy_function: Optional[Callable[[List[Dict]], List[Dict]]] = None,
             chat_template: Optional[str] = None,
+            only_target_loss: bool = False,
     ):
         self.original_records = original_records
         self.tokenizer = tokenizer
@@ -33,6 +34,7 @@ class ChatDataset(Dataset):
         self.converter = converter
         self.strategy_function = strategy_function
         self.chat_template = chat_template
+        self.only_target_loss = only_target_loss
         self.is_printed = True
 
         self.records = []
@@ -66,6 +68,7 @@ class ChatDataset(Dataset):
             tokens = apply_chat_template(
                 messages,
                 chat_template=self.chat_template,
+                add_special_tokens=False,
                 tokenize=True,
                 add_generation_prompt=False,
                 tokenizer=self.tokenizer,
@@ -125,6 +128,18 @@ class ChatDataset(Dataset):
             if start_idx < 0:
                 start_idx = 0
 
+            if self.only_target_loss:
+                current_idx = 0
+                for message in messages:
+                    message_tokens = self.get_tokens([message])
+                    message_len = len(message_tokens)
+                    if message["role"] in ("assistant", "bot", "gpt"):
+                        labels[current_idx:current_idx + message_len] = input_ids[current_idx:current_idx + message_len]
+                    current_idx += message_len
+            else:
+                # If only_target_loss=False, then labels is a copy of input_ids
+                labels = input_ids.tolist()
+
             # Set labels for the last message
             labels[start_idx:end_idx] = input_ids[start_idx:end_idx]
 
@@ -181,6 +196,7 @@ if __name__ == '__main__':
         original_records=records,
         tokenizer=tokenizer,
         max_tokens_count=1024,
+        only_target_loss=True,
     )
 
     print(dataset[0])

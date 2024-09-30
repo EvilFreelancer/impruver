@@ -13,9 +13,9 @@ datasets:
 model:
   class: transformers.AutoModelForCausalLM
   name: ai-forever/rugpt3small_based_on_gpt2
+  dtype: bf16
   load_in_4bit: false
   load_in_8bit: true
-  dtype: fp16
 
 lora:
   r: 32
@@ -32,8 +32,10 @@ tokenizer:
   #max_tokens_count: 2048
 
 trainer:
-  eval_strategy: epoch
-  save_strategy: epoch
+  eval_strategy: steps
+  save_strategy: steps
+  eval_steps: 10
+  save_steps: 10
   per_device_train_batch_size: 8
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 128

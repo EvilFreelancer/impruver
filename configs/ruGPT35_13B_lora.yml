@@ -40,8 +40,10 @@ tokenizer:
   max_tokens_count: 1024
 
 trainer:
-  eval_strategy: epoch
-  save_strategy: epoch
+  eval_strategy: steps
+  save_strategy: steps
+  eval_steps: 10
+  save_steps: 10
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 128

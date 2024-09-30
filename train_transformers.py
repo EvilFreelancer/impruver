@@ -3,6 +3,7 @@ import random
 import fire
 import yaml
 
+import wandb
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorForTokenClassification
 from transformers import Trainer, TrainingArguments, logging, BitsAndBytesConfig
@@ -152,10 +153,16 @@ def train(
     training_args_dict = trainer_config.copy()
     training_args_dict.update(ddp_config)
 
+    # If reporting to W&B is enabled
+    if trainer_config.get("report_to", None) == "wandb":
+        os.environ["WANDB_MODE"] = "online"
+        wandb.init(project="impruver", config=config)
+
     # Prepare trainer configuration
     training_args = TrainingArguments(
         output_dir=output_dir,
         report_to=report_to,
+        run_name=config_file,
         **training_args_dict
     )
 
@@ -167,13 +174,6 @@ def train(
         eval_dataset=val_dataset,
         data_collator=data_collator,
     )
-
-    # If reporting to W&B is enabled
-    os.environ["WANDB_DISABLED"] = "true"
-    if trainer_config.get("report_to", None) == "wandb":
-        import wandb
-        os.environ["WANDB_DISABLED"] = "false"
-        wandb.init(project="rulm_self_instruct", name=config_file)
 
     #
     # Training loop

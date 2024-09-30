@@ -41,14 +41,13 @@ def load_datasets(config, tokenizer, max_tokens_count):
 
         # Load the actual dataset from HuggingFace's datasets library.
         hf_dataset = load_dataset(dataset['name'], split=split)
-        # print(hf_dataset[0])
-        # exit()
 
         # Create an instance of ChatDataset
         chat_dataset = ChatDataset(
             original_records=list(hf_dataset),
             tokenizer=tokenizer,
             converter=converter,
+            only_target_loss=dataset.get("only_target_loss", True),
             max_tokens_count=dataset.get("max_tokens_count", max_tokens_count),
         )
 
