@@ -9,9 +9,15 @@ datasets:
     converter: impruver.data.instruction_to_messages
   - name: IlyaGusev/ru_turbo_saiga
     converter: impruver.data.dialog_to_messages
-#  - name: IlyaGusev/ru_sharegpt_cleaned
-#    converter: impruver.data.dialog_to_messages
-
+  - name: IlyaGusev/ru_sharegpt_cleaned
+    converter: impruver.data.dialog_to_messages
+  - name: IlyaGusev/oasst1_ru_main_branch
+    converter: impruver.data.dialog_to_messages
+  - name: lksy/ru_instruct_gpt4
+    converter: impruver.data.instruction_to_messages
+#  - name: IlyaGusev/gpt_roleplay_realm
+#    converter: impruver.data.char_dialog_to_messages
+#    split: ru
 
 model:
   class: transformers.AutoModelForCausalLM
