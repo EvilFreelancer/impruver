@@ -6,14 +6,14 @@ from .tokenizer import Tokenizer
 DEFAULT_CHAT_TEMPLATE = (
     "{% set loop_messages = messages %}"
         "{% for message in loop_messages %}"
-            "{% set content = '' + message['role'] + '\n' + message['content'] | trim + '' %}"
+            "{% set content = '' + message['role'] + '\\n' + message['content'] | trim + '' %}"
             "{% if loop.index0 == 0 %}"
                 "{% set content = bos_token + content %}"
             "{% endif %}"
-            '{{ content }}\n\n'
+            '{{ content }}\\n\\n'
         "{% endfor %}"
     "{% if add_generation_prompt %}"
-        "{{ 'assistant\n' }}"
+        "{{ 'assistant\\n' }}"
     "{% endif %}"
 )
 

@@ -1,21 +1,30 @@
 output_dir: ./models/rugpt3small_lora
-train_path: ./train.jsonl
-val_path: ./val.jsonl
+train_path: ./train.rugpt3small.jsonl
+val_path: ./val.rugpt3small.jsonl
 
 datasets:
-  - class: transformers.AutoModelForCausalLM
-    name: mahiatlinux/Reflection-Dataset-ShareGPT-v2
-    # Name of split in dataset
-    split: train # you may limit these split like train[:1000] - this mean get first 1000 elements from train split
-    # Max tokens per single conversation (dataset level)
-    #max_tokens_count: 2048
+  - name: IlyaGusev/ru_turbo_alpaca
+    converter: impruver.instruction_to_messages
+  - name: IlyaGusev/ru_turbo_alpaca_evol_instruct
+    converter: impruver.instruction_to_messages
+  - name: IlyaGusev/ru_turbo_saiga
+    converter: impruver.dialog_to_messages
+  - name: IlyaGusev/ru_sharegpt_cleaned
+    converter: impruver.dialog_to_messages
+  - name: IlyaGusev/oasst1_ru_main_branch
+    converter: impruver.dialog_to_messages
+  - name: lksy/ru_instruct_gpt4
+    converter: impruver.converters.instruction_to_messages
+#  - name: IlyaGusev/gpt_roleplay_realm
+#    converter: impruver.char_dialog_to_messages
+#    split: ru
 
 model:
   class: transformers.AutoModelForCausalLM
   name: ai-forever/rugpt3small_based_on_gpt2
-  dtype: bf16
   load_in_4bit: false
   load_in_8bit: true
+  dtype: bf16
 
 lora:
   r: 32
@@ -28,8 +37,6 @@ lora:
 tokenizer:
   class: transformers.AutoTokenizer
   name: ai-forever/rugpt3small_based_on_gpt2
-  # Max tokens per single conversation (tokenizer level), use default if not set
-  #max_tokens_count: 2048
 
 trainer:
   eval_strategy: steps
@@ -40,7 +47,7 @@ trainer:
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 128
   logging_steps: 1
-  learning_rate: 0.00002
+  learning_rate: 0.00005
   num_train_epochs: 2
   lr_scheduler_type: cosine
   warmup_steps: 16

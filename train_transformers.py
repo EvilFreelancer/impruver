@@ -10,6 +10,7 @@ from transformers import Trainer, TrainingArguments, logging, BitsAndBytesConfig
 from peft import get_peft_model, LoraConfig
 
 from impruver.utils import set_seed, read_jsonl, get_dtype, dynamic_import
+from impruver.data import DEFAULT_CHAT_TEMPLATE
 
 
 def train(
@@ -83,6 +84,11 @@ def train(
     # Init tokenizer object
     tokenizer_obj = dynamic_import(tokenizer_class)
     tokenizer = tokenizer_obj.from_pretrained(tokenizer_name)
+
+    # Check if `chat_template` attribute exists in tokenizer
+    if not hasattr(tokenizer, 'chat_template') or tokenizer.chat_template is None:
+        # If it doesn't exist, use default
+        tokenizer.chat_template = DEFAULT_CHAT_TEMPLATE
 
     # Save tokenizer object with all configs to an output folder
     tokenizer.save_pretrained(output_dir)

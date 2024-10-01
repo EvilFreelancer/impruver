@@ -1,22 +1,22 @@
 output_dir: ./models/ruGPT35_13B_lora
-train_path: ./train.jsonl
-val_path: ./val.jsonl
+train_path: ./train.ruGPT35_13B.jsonl
+val_path: ./val.ruGPT35_13B.jsonl
 
 datasets:
   - name: IlyaGusev/ru_turbo_alpaca
-    converter: impruver.data.instruction_to_messages
+    converter: impruver.instruction_to_messages
   - name: IlyaGusev/ru_turbo_alpaca_evol_instruct
-    converter: impruver.data.instruction_to_messages
+    converter: impruver.instruction_to_messages
   - name: IlyaGusev/ru_turbo_saiga
-    converter: impruver.data.dialog_to_messages
+    converter: impruver.dialog_to_messages
   - name: IlyaGusev/ru_sharegpt_cleaned
-    converter: impruver.data.dialog_to_messages
+    converter: impruver.dialog_to_messages
   - name: IlyaGusev/oasst1_ru_main_branch
-    converter: impruver.data.dialog_to_messages
+    converter: impruver.dialog_to_messages
   - name: lksy/ru_instruct_gpt4
-    converter: impruver.data.instruction_to_messages
+    converter: impruver.converters.instruction_to_messages
 #  - name: IlyaGusev/gpt_roleplay_realm
-#    converter: impruver.data.char_dialog_to_messages
+#    converter: impruver.char_dialog_to_messages
 #    split: ru
 
 model:
@@ -42,17 +42,17 @@ tokenizer:
 trainer:
   eval_strategy: steps
   save_strategy: steps
-  eval_steps: 10
-  save_steps: 10
+  eval_steps: 100
+  save_steps: 100
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 128
   logging_steps: 1
-  learning_rate: 0.0003
-  num_train_epochs: 5
+  learning_rate: 0.0005
+  num_train_epochs: 1
   lr_scheduler_type: cosine
   warmup_steps: 30
-  optim: adamw_torch
+  optim: adamw_8bit
   metric_for_best_model: eval_loss
   load_best_model_at_end: true
   save_total_limit: 2

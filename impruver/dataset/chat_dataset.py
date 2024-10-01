@@ -1,3 +1,4 @@
+import json
 from typing import List, Dict, Callable, Optional
 from tqdm import tqdm
 
@@ -84,6 +85,8 @@ class ChatDataset(Dataset):
             messages = self.converter(record)
         else:
             messages = record["messages"]
+            if isinstance(record["messages"], str):
+                messages = json.loads(record["messages"])
 
         # Ig sample is empty, then we don't need it
         if messages is None:
