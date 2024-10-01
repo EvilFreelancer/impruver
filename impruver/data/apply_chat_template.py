@@ -6,20 +6,20 @@ from .tokenizer import Tokenizer
 DEFAULT_RAW_TEMPLATE = (
     "{% set loop_messages = messages %}"
     "{% for message in loop_messages %}"
-    "{% set content = '' + message['content'] | trim + '' %}"
-    '{{ bos_token + content + eos_token }}\n'
+        "{% set content = '' + message['content'] | trim + '' %}"
+        '{{ bos_token + content + eos_token }}\n'
     "{% endfor %}"
 )
 
 DEFAULT_CHAT_TEMPLATE = (
     "{% set loop_messages = messages %}"
     "{% for message in loop_messages %}"
-    "{% set content = '' + message['role'] + '\n' + message['content'] | trim + '' %}"
-    '{{ bos_token + content + eos_token}}\n'
+        "{% set content = '' + message['role'] + '\n' + message['content'] | trim + '' %}"
+        '{{ bos_token + content + eos_token}}\n'
     "{% endfor %}"
     "{% if add_generation_prompt %}"
-    "{% set content = 'assistant' + '\n' + message['content'] | trim + '' %}"
-    "{{ bos_token + content }}"
+        "{% set content = 'assistant' + '\n' %}"
+        "{{ bos_token + content }}"
     "{% endif %}"
 )
 
