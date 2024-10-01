@@ -1,23 +1,10 @@
-output_dir: ./models/rugpt3large_full
-train_path: ./train.rugpt3large.jsonl
-val_path: ./val.rugpt3large.jsonl
+output_dir: ./models/rugpt3large_fc_full
+train_path: ./train.rugpt3large_fc.jsonl
+val_path: ./val.rugpt3large_fc.jsonl
 
 datasets:
-  - name: IlyaGusev/ru_turbo_alpaca
-    converter: impruver.instruction_to_messages
-  - name: IlyaGusev/ru_turbo_alpaca_evol_instruct
-    converter: impruver.instruction_to_messages
-  - name: IlyaGusev/ru_turbo_saiga
-    converter: impruver.dialog_to_messages
-  - name: IlyaGusev/ru_sharegpt_cleaned
-    converter: impruver.dialog_to_messages
-  - name: IlyaGusev/oasst1_ru_main_branch
-    converter: impruver.dialog_to_messages
-  - name: lksy/ru_instruct_gpt4
-    converter: impruver.converters.instruction_to_messages
-#  - name: IlyaGusev/gpt_roleplay_realm
-#    converter: impruver.char_dialog_to_messages
-#    split: ru
+  - name: korotkov/glaive-function-calling-v2-ru-parsed
+    split: train
 
 model:
   class: transformers.AutoModelForCausalLM
