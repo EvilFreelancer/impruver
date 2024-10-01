@@ -3,17 +3,23 @@ from jinja2 import Template
 
 from .tokenizer import Tokenizer
 
+DEFAULT_RAW_TEMPLATE = (
+    "{% set loop_messages = messages %}"
+    "{% for message in loop_messages %}"
+        "{% set content = '' + message['content'] | trim + '' %}"
+        '{{ bos_token + content + eos_token }}\n'
+    "{% endfor %}"
+)
+
 DEFAULT_CHAT_TEMPLATE = (
     "{% set loop_messages = messages %}"
-        "{% for message in loop_messages %}"
-            "{% set content = '' + message['role'] + '\\n' + message['content'] | trim + '' %}"
-            "{% if loop.index0 == 0 %}"
-                "{% set content = bos_token + content %}"
-            "{% endif %}"
-            '{{ content }}\\n\\n'
-        "{% endfor %}"
+    "{% for message in loop_messages %}"
+        "{% set content = '' + message['role'] + '\n' + message['content'] | trim + '' %}"
+        '{{ bos_token + content + eos_token}}\n'
+    "{% endfor %}"
     "{% if add_generation_prompt %}"
-        "{{ 'assistant\\n' }}"
+        "{% set content = 'assistant' + '\n' + message['content'] | trim + '' %}"
+        "{{ bos_token + content }}"
     "{% endif %}"
 )
 
