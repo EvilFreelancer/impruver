@@ -1,0 +1,53 @@
+output_dir: ./models/ruGPT35_13B_lora_fc
+train_path: ./train.ruGPT35_13B_fc.jsonl
+val_path: ./val.ruGPT35_13B_fc.jsonl
+
+datasets:
+  - name: korotkov/glaive-function-calling-v2-ru-parsed
+    split: train
+
+model:
+  class: transformers.AutoModelForCausalLM
+  name: ai-forever/ruGPT-3.5-13B
+  load_in_4bit: true
+  load_in_8bit: false
+  dtype: bf16
+
+lora:
+  r: 16
+  lora_alpha: 16
+  lora_dropout: 0.05
+  bias: none
+  target_modules: [ c_attn ]
+  task_type: CAUSAL_LM
+
+tokenizer:
+  class: transformers.AutoTokenizer
+  name: ai-forever/ruGPT-3.5-13B
+  max_tokens_count: 1024
+
+trainer:
+  eval_strategy: steps
+  save_strategy: steps
+  eval_steps: 100
+  save_steps: 100
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 128
+  logging_steps: 1
+  learning_rate: 0.0005
+  num_train_epochs: 1
+  lr_scheduler_type: cosine
+  warmup_steps: 30
+  optim: adamw_8bit
+  metric_for_best_model: eval_loss
+  load_best_model_at_end: true
+  save_total_limit: 2
+  seed: 42
+  remove_unused_columns: false
+  max_grad_norm: 1.0
+  weight_decay: 0.08
+  torch_compile: false
+
+#ddp:
+#  ddp_find_unused_parameters: false
