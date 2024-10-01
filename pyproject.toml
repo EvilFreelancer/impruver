@@ -39,7 +39,6 @@ dynamic = ["version"]
 dev = [
     "wandb>=0.18.2",
     "tiktoken>=0.7.0",
-    "mmh3>=5.0.1",
 ]
 
 [tool.setuptools.dynamic]

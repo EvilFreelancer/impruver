@@ -27,4 +27,3 @@ accelerate>=0.34.2
 # Other
 wandb>=0.18.2
 tiktoken>=0.7.0
-mmh3>=5.0.1

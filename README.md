@@ -13,11 +13,19 @@ python3 -m venv venv
 . venv/bin/activate
 ```
 
-Далее ставим пакеты:
+Если планируется обучение моделей, поддерживающих Flash Attention, то сначала это:
 
 ```shell
 pip install "torch>=2.4.1"
+pip install setuptools psutil
 pip install "flash-attn>=2.6.3" --no-build-isolation
+pip install -r requirements.txt
+pip install .
+```
+
+Если будете обучать модель без Flash Attention то понадобится только это выполнить: 
+
+```shell
 pip install -r requirements.txt
 pip install .
 ```

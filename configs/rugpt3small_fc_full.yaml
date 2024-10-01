@@ -4,7 +4,7 @@ val_path: ./val.rugpt3small_fc.jsonl
 
 datasets:
   - name: korotkov/glaive-function-calling-v2-ru-parsed
-    split: train[:1000]
+    split: train
 
 model:
   class: transformers.AutoModelForCausalLM
