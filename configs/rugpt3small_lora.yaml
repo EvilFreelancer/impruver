@@ -47,10 +47,10 @@ trainer:
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 128
   logging_steps: 1
-  learning_rate: 0.00005
+  learning_rate: 0.0006
   num_train_epochs: 2
   lr_scheduler_type: cosine
-  warmup_steps: 16
+  warmup_steps: 2000
   optim: paged_adamw_8bit
   metric_for_best_model: eval_loss
   load_best_model_at_end: true
@@ -58,7 +58,7 @@ trainer:
   seed: 42
   remove_unused_columns: false
   max_grad_norm: 1.0
-  weight_decay: 0.08
+  weight_decay: 0.1
 
 #ddp:
 #  ddp_find_unused_parameters: false
