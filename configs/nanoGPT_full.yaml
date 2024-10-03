@@ -1,6 +1,6 @@
-output_dir: ./models/rugpt3large_full
-train_path: ./train.rugpt3large.jsonl
-val_path: ./val.rugpt3large.jsonl
+output_dir: ./models/nanoGPT_full
+train_path: ./train.nanoGPT.jsonl
+val_path: ./val.nanoGPT.jsonl
 
 datasets:
   - name: IlyaGusev/ru_turbo_alpaca
@@ -10,24 +10,47 @@ datasets:
 model:
   class: transformers.GPT2LMHeadModel
   dtype: bf16
+  config_class: transformers.GPT2Config
+  config:
+    torch_dtype: float16
+    attn_pdrop: 0.1
+    n_layer: 6
+    n_head: 6
+    n_embd: 384
+    dropout: 0.2
+    initializer_range: 0.02
+    vocab_size: 123 # read from tokenizer
 
 tokenizer:
-  class: transformers.GPT2LMHeadModel
-  name: ai-forever/rugpt3large_based_on_gpt2
+  class: transformers.GPT2Tokenizer
+  name: ./models/nanoGPT-tokenizer
+  special_tokens:
+    pad_token_id: 0
+    pad_token: <pad>
+    bos_token_id: 1
+    bos_token: <s>
+    eos_token_id: 2
+    eos_token: </s>
+    unk_token_id: 3
+    unk_token: <unk>
 
 trainer:
   eval_strategy: steps
   save_strategy: steps
-  eval_steps: 10
+  eval_steps: 200
   save_steps: 10
-  per_device_train_batch_size: 1
-  per_device_eval_batch_size: 1
+  per_device_train_batch_size: 64
+  per_device_eval_batch_size: 64
   gradient_accumulation_steps: 1
-  logging_steps: 1
-  learning_rate: 0.00005
-  num_train_epochs: 2
+  logging_steps: 10
+  beta1: 0.9
+  beta2: 0.99
+  learning_rate: 0.001
+  min_lr: 1e-4
+  num_train_epochs: 3
+  max_steps: 5000
   lr_scheduler_type: cosine
-  warmup_steps: 16
+  warmup_steps: 100
   optim: paged_adamw_8bit
   metric_for_best_model: eval_loss
   load_best_model_at_end: true

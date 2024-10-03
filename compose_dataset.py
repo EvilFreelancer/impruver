@@ -47,7 +47,7 @@ def load_datasets(config, tokenizer, max_tokens_count):
             original_records=list(hf_dataset),
             tokenizer=tokenizer,
             converter=converter,
-            only_target_loss=dataset.get("only_target_loss", False),
+            only_target_loss=dataset.get("only_target_loss", True),
             max_tokens_count=dataset.get("max_tokens_count", max_tokens_count),
         )
 

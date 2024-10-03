@@ -53,18 +53,17 @@ def train(
     if "class" in config["model"]:
         model_class = config["model"]["class"]
 
-    # Read repo_id of model or path to model weights on disk
-    model_name = config["model"]["name"]
-
     # Class to work with Tokenizer
     tokenizer_class = "transformers.AutoTokenizer"
     if "class" in config["tokenizer"]:
         tokenizer_class = config["tokenizer"]["class"]
 
     # Read repo_id of tokenizer or path to configs on disk#
-    tokenizer_name = model_name
+    tokenizer_name = None
     if "name" in config["tokenizer"]:
         tokenizer_name = config["tokenizer"]["name"]
+    elif "name" in config["model"]:
+        tokenizer_name = config["model"]["name"]
 
     # Settings related to bitsandbytes and useful only with LoRA adapter training
     load_in_4bit = False
@@ -138,13 +137,22 @@ def train(
 
     # Init model object
     model_obj = dynamic_import(model_class)
-    model = model_obj.from_pretrained(
-        model_name,
-        quantization_config=quantization_config,
-        device_map=None if ddp_config else "auto", # need to be disabled for DDP
-        torch_dtype=dtype,
-        attn_implementation=attn_implementation,
-    )
+
+    # If model name is set then pre-train
+    if 'name' in config["model"]:
+        model = model_obj.from_pretrained(
+            config["model"]["name"],
+            quantization_config=quantization_config,
+            device_map=None if ddp_config else "auto",  # need to be disabled for DDP
+            torch_dtype=dtype,
+            attn_implementation=attn_implementation
+        )
+    else:
+        # Init from scratch
+        model_config_class = config["model"]['config_class']
+        model_config_class_obj = dynamic_import(model_config_class)
+        model_config = model_config_class_obj(**config["model"]["config"])
+        model = model_obj._from_config(model_config)
 
     # If we need to train a LoRA adapter
     if lora_config:
