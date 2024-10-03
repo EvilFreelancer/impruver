@@ -1,10 +1,13 @@
 import json
 from typing import List, Dict, Callable, Optional
+
+from mpmath import primepi
 from tqdm import tqdm
 
 import torch
 from torch.utils.data import Dataset
 from transformers import AutoTokenizer, logging
+from transformers.testing_utils import parse_int_from_env
 
 from impruver.data import apply_chat_template
 
@@ -36,7 +39,7 @@ class ChatDataset(Dataset):
         self.strategy_function = strategy_function
         self.chat_template = chat_template
         self.only_target_loss = only_target_loss
-        self.is_printed = True
+        self.is_printed = False
 
         self.records = []
         for record in tqdm(original_records):
@@ -75,10 +78,7 @@ class ChatDataset(Dataset):
                 tokenizer=self.tokenizer,
             )
 
-        if int(tokens[0][0]) == self.tokenizer.bos_token_id:
-            tokens = tokens[0][1:]
-
-        return tokens
+        return tokens[0]
 
     def convert_record(self, record):
         if self.converter:
@@ -107,44 +107,17 @@ class ChatDataset(Dataset):
             _log.info(f'Input is "{len(input_ids)}" tokens, max allowed is "{self.max_tokens_count}" tokens, skip...')
             return None
 
-        # Create list of labels with same size as input_ids list
-        labels = [self.labels_pad_token_id] * len(input_ids)
-
-        # Find the last message in conversation
-        last_indices = [idx for idx, msg in enumerate(messages)]
-        if last_indices:
-            last_idx = last_indices[-1]
-
-            # Tokenize messages including the last message
-            tokens_up_to_last = self.get_tokens(messages[: last_idx + 1])
-
-            # Tokenize the last message
-            last_tokens = self.get_tokens([messages[last_idx]])
-
-            # Calculate start and end indices of the last assistant's message in tokens
-            start_idx = len(tokens_up_to_last) - len(last_tokens)
-            end_idx = len(tokens_up_to_last)
-
-            # Adjust indices if truncated
-            if end_idx > len(labels):
-                end_idx = len(labels)
-            if start_idx < 0:
-                start_idx = 0
-
-            if self.only_target_loss:
-                current_idx = 0
-                for message in messages:
-                    message_tokens = self.get_tokens([message])
-                    message_len = len(message_tokens)
-                    if message["role"] in ("assistant", "bot", "gpt"):
-                        labels[current_idx:current_idx + message_len] = input_ids[current_idx:current_idx + message_len]
-                    current_idx += message_len
-            else:
-                # If only_target_loss=False, then labels is a copy of input_ids
-                labels = input_ids.tolist()
-
-            # Set labels for the last message
-            labels[start_idx:end_idx] = input_ids[start_idx:end_idx]
+        # If only_target_loss=False, then labels is a copy of input_ids
+        if self.only_target_loss:
+            labels = []
+            for message in messages:
+                message_tokens = self.get_tokens([message])
+                if message["role"] in ("assistant", "function_call"):
+                    labels += message_tokens
+                else:
+                    labels += [self.labels_pad_token_id] * len(message_tokens)
+        else:
+            labels = input_ids.tolist()
 
         # Add global BOS and EOS tokens if specified
         if self.add_global_bos and input_ids[0] != self.tokenizer.bos_token_id:
