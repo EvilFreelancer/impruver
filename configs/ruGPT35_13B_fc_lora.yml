@@ -1,5 +1,5 @@
 # Training time
-# - 1x RTX 4090 ~ 4h 52m
+# - 1x RTX 4090 ~ 20Gb VRAM ~ ...
 
 output_dir: ./models/ruGPT35_13B_lora_fc
 train_path: ./train.ruGPT35_13B_fc.jsonl
@@ -27,7 +27,7 @@ lora:
 tokenizer:
   class: transformers.AutoTokenizer
   name: ai-forever/ruGPT-3.5-13B
-  max_tokens_count: 1024
+  max_tokens_count: 1200
 
 trainer:
   eval_strategy: steps
@@ -36,12 +36,12 @@ trainer:
   save_steps: 100
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
-  gradient_accumulation_steps: 1
+  gradient_accumulation_steps: 128
   logging_steps: 1
-  learning_rate: 0.00002
+  learning_rate: 0.0002
   num_train_epochs: 2
   lr_scheduler_type: cosine
-  warmup_steps: 2
+  warmup_steps: 16
   optim: adamw_8bit
   metric_for_best_model: eval_loss
   load_best_model_at_end: true

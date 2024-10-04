@@ -13,17 +13,25 @@ model:
   config_class: transformers.GPT2Config
   config:
     torch_dtype: float16
-    attn_pdrop: 0.1
     n_layer: 6
     n_head: 6
+    n_inner: null
     n_embd: 384
-    dropout: 0.2
+    _attn_implementation: eager
+    max_position_embeddings: 256
+    attn_pdrop: 0.2
+    embd_pdrop: 0.2
+    resid_pdrop: 0.2
     initializer_range: 0.02
-    vocab_size: 123 # read from tokenizer
+    layer_norm_epsilon: 1e-5
+    vocab_size: 50304
 
 tokenizer:
-  class: transformers.GPT2Tokenizer
-  name: ./models/nanoGPT-tokenizer
+  class: transformers.AutoTokenizer
+  name: ai-forever/rugpt3small_based_on_gpt2
+#tokenizer:
+#  class: transformers.GPT2Tokenizer
+#  name: ./models/nanoGPT-tokenizer
   special_tokens:
     pad_token_id: 0
     pad_token: <pad>

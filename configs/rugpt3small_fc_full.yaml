@@ -1,6 +1,6 @@
 # Training time
-# - 1x RTX 3050 ~ 4h 9m
-# - 1x RTX 4090 ~ 37m
+# - 1x RTX 3050 ~ 6.8GiB ~ 4h 9m (train_batch_size: 1)
+# - 1x RTX 4090 ~ 20.5GiB ~ 37m
 
 output_dir: ./models/rugpt3small_fc_full
 train_path: ./train.rugpt3small_fc.jsonl
