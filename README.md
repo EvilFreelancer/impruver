@@ -20,7 +20,7 @@ Language Models (LLM).
 ## Рекомендации
 
 * Python 3.12
-* Python VirtualE nvironment
+* Python Virtual Environment
 * Nvidia GPU с 24Гб VRAM
 * Драйвера Nvidia и CUDA
 
