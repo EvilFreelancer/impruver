@@ -1,8 +1,9 @@
 # impruver
 
-Проекта для обучения Больших Языковых Моделей (БЯМ) или же на английском Large Language Models (LLM).
+Набор скриптов и конфигураций для самостоятельного обучения Больших Языковых Моделей (БЯМ) или же на английском Large
+Language Models (LLM).
 
-Вдохновлён проектами: [saiga](https://github.com/IlyaGusev/saiga), 
+Вдохновлён проектами: [saiga](https://github.com/IlyaGusev/saiga),
 [torchtune](https://github.com/pytorch/torchtune),
 [nanoGPT](https://github.com/karpathy/nanoGPT).
 
