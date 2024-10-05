@@ -1,6 +1,6 @@
-# converter
+# `converter` функция
 
-Функция конвертации отдельного элемента необходима для того, чтобы привести все входящие данные к общему виду.
+Функция конвертации отдельного элемента необходима для того, чтобы привести все входящие данные датасета к общему виду.
 
 Например, у нас имеется датасет на HuggingFace со стриктурой вида:
 
@@ -20,10 +20,57 @@
 
 Для того чтобы преобразовать сообщения из первой формы во вторую и нужна функция конвертация.
 
-Пример реализации:
+## Конвертеры в стандартной поставке
+
+Полный список и исходные коды всех доступных конвертеров можно найти 
+[тут](/impruver/converters):
+
+* [conversations_to_messages](/impruver/converters/conversations_to_messages.py)
+
+    На входе:
+    
+    ```json lines
+    {"conversation": [{"from": "human", "value": "human text"}, {"from": "bot", "value": "bot text"}]}
+    ```
+    
+    На выходе:
+    
+    ```json lines
+    [{"role": "user", "content": "human text"}, {"role": "assistant", "content": "bot text"}]
+    ```
+
+* [dialog_to_messages](/impruver/converters/dialog_to_messages.py)
+
+    На входе:
+    
+    ```json lines
+    {"messages": {"roles": ["user", "assistant"], "content": ["user text", "assistant text"]}}
+    ```
+    
+    На выходе:
+    
+    ```json lines
+    [{"role": "user", "content": "user text"}, {"role": "assistant", "content": "assistant text"}]
+    ```
+
+* [instruction_to_messages](/impruver/converters/instruction_to_messages.py)
+
+    На входе:
+    
+    ```json lines
+    {"instruction": "instruction text", "input": "input text", "output": "output text"}
+    ```
+    
+    На выходе:
+    
+    ```json lines
+    [{"role": "user", "content": "instruction text\ninput text"}, {"role": "assistant", "content": "output text"}]
+    ```
+
+## Пример своей реализации
 
 ```python
-def conversations_to_messages(conversation: dict) -> list:
+def simple_conversations_to_messages(conversation: dict) -> list:
     messages = []
     for item in conversation['conversations']:
         messages.append({
@@ -51,7 +98,7 @@ hf_dataset = load_dataset('mahiatlinux/Reflection-Dataset-ShareGPT-v2', split='t
 chat_dataset = ChatDataset(
     original_records=list(hf_dataset),
     tokenizer=tokenizer,
-    converter=conversations_to_messages,
+    converter=simple_conversations_to_messages,
     max_tokens_count=1024
 )
 ```
@@ -61,3 +108,16 @@ chat_dataset = ChatDataset(
 ```json lines
 {"messages":[{"role":"user","value":"text"},{"role":"assistant","value":"text"}]}
 ```
+
+Вы можете сохранить эту функцию в директории рядом с которой находится
+скрипт комбинирования датасета, назвав файл скажем `my_converter.py`.
+
+Затем в конфигураци, в `datasets` указать сначала путь до пакета, потом
+название функции ковертации:
+
+```yaml
+datasets:
+  - name: my_org/my_dataset
+    converter: my_converter.simple_conversations_to_messages
+```
+

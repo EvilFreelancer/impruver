@@ -1,6 +1,3 @@
-from sympy.polys.subresultants_qq_zz import rotate_l
-
-
 def conversations_to_messages(sample: dict) -> list:
     """
     Simple function to convert a conversation to a list of messages.

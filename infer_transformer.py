@@ -1,43 +1,34 @@
 import yaml
 import fire
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorForTokenClassification, GenerationConfig
-from transformers import Trainer, TrainingArguments, logging, BitsAndBytesConfig
-from peft import get_peft_model, LoraConfig
+from transformers import logging, GenerationConfig, BitsAndBytesConfig
 
-from impruver.utils import set_seed, read_jsonl, get_dtype, dynamic_import
-from impruver.data import apply_chat_template, DEFAULT_CHAT_TEMPLATE
+from impruver.utils import set_seed, get_dtype, dynamic_import
 
-FUNCTION = """{
-    'name': 'calculate_loan_payment',
-    'description': 'Рассчитать ежемесячный платеж по кредиту',
-    'parameters': {
-        'type': 'object',
-        'properties': {
-            'principal': {
-                'type': 'number',
-                'description': 'Основная сумма кредита'
-            },
-            'interest_rate': {
-                'type': 'number',
-                'description': 'Годовая процентная ставка'
-             },
-            'loan_term': {
-                'type': 'integer',
-                'description': 'Срок кредита в годах'
+FUNCTION = """
+{
+    "name": "get_news_headlines",
+    "description": "Запросить заголовки новостей на конкретную тематику только если пользователь об этом попросил",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "topic": {
+                "type": "string",
+                "description": "Тематика новостей"
             }
         },
-        'required': ['principal', 'interest_rate', 'loan_term']
-    }
-}"""
+        "required": [ "topic" ]
+    } 
+}
+"""
 DEFAULT_SYSTEM_PROMPT = f"Ты полезный помощник с доступом к следующим функциям. Используй их при необходимости:\n{FUNCTION}"
 
 
 class ChatHistory:
     def __init__(self, history_limit: int = None):
         self.history_limit = history_limit
-        # self.system_prompt = DEFAULT_SYSTEM_PROMPT
-        self.system_prompt = None
+        self.system_prompt = DEFAULT_SYSTEM_PROMPT
+        # self.system_prompt = None
         self.messages = []
         if self.system_prompt is not None:
             self.messages.append({"role": "system", "content": self.system_prompt})
@@ -52,6 +43,12 @@ class ChatHistory:
     def add_assistant_message(self, message):
         self.add_message("assistant", message)
 
+    def add_function_call(self, message):
+        self.add_message("function_call", message)
+
+    def add_function_response(self, message):
+        self.add_message("function_response", message)
+
     def trim_history(self):
         appendix = 0
         if self.system_prompt is not None:
@@ -65,29 +62,12 @@ class ChatHistory:
 
 
 def get_prompt(tokenizer, messages, add_generation_prompt=False):
-    if (
-            hasattr(tokenizer, 'apply_chat_template')
-            and hasattr(tokenizer, 'chat_template')
-            and tokenizer.chat_template is not None
-    ):
-        prompt = tokenizer.apply_chat_template(
-            messages,
-            chat_template=DEFAULT_CHAT_TEMPLATE,
-            add_special_tokens=False,
-            tokenize=False,
-            add_generation_prompt=add_generation_prompt,
-        )
-    else:
-        # Assume apply_chat_template is a function you have defined
-        prompt = apply_chat_template(
-            messages,
-            chat_template=DEFAULT_CHAT_TEMPLATE,
-            tokenize=False,
-            add_generation_prompt=add_generation_prompt,
-            # tokenizer=tokenizer,
-        )
-
-    return prompt
+    return tokenizer.apply_chat_template(
+        messages,
+        add_special_tokens=False,
+        tokenize=False,
+        add_generation_prompt=add_generation_prompt,
+    )
 
 
 def generate(model, tokenizer, prompt, generation_config):
@@ -135,13 +115,6 @@ def infer(
     if "class" in config["tokenizer"]:
         tokenizer_class = config["tokenizer"]["class"]
 
-    # Read repo_id of tokenizer or path to configs on disk#
-    tokenizer_name = None
-    if "name" in config["tokenizer"]:
-        tokenizer_name = config["tokenizer"]["name"]
-    elif "name" in config["model"]:
-        tokenizer_name = config["model"]["name"]
-
     # Settings related to bitsandbytes and useful only with LoRA adapter training
     load_in_4bit = False
     if "load_in_4bit" in config["model"]:
@@ -187,7 +160,7 @@ def infer(
 
     # Generator config
     generation_config = GenerationConfig.from_pretrained(output_dir)
-    generation_config.max_new_tokens = 1024
+    generation_config.max_new_tokens = 2048
     generation_config.repetition_penalty = 1.2
 
     # Attention implementation
