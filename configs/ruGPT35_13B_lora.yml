@@ -17,7 +17,7 @@ datasets:
   - name: IlyaGusev/oasst1_ru_main_branch
     converter: impruver.dialog_to_messages
   - name: lksy/ru_instruct_gpt4
-    converter: impruver.converters.instruction_to_messages
+    converter: impruver.instruction_to_messages
 #  - name: IlyaGusev/gpt_roleplay_realm
 #    converter: impruver.char_dialog_to_messages
 #    split: ru

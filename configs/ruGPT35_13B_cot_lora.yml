@@ -1,13 +1,13 @@
 # Training time
 # - 1x RTX 4090 ~ 20Gb VRAM ~ 11h 8m
 
-output_dir: ./models/ruGPT35_13B_lora_fc
-train_path: ./train.ruGPT35_13B_fc.jsonl
-val_path: ./val.ruGPT35_13B_fc.jsonl
+output_dir: ./models/ruGPT35_13B_lora_cot
+train_path: ./train.ruGPT35_13B_cot.jsonl
+val_path: ./val.ruGPT35_13B_cot.jsonl
 
 datasets:
-  - name: korotkov/glaive-function-calling-v2-ru-parsed
-    split: train
+  - name: evilfreelancer/ru-chain-of-thought-sharegpt
+    converter: impruver.conversations_to_messages
 
 model:
   class: transformers.AutoModelForCausalLM
@@ -36,7 +36,7 @@ trainer:
   save_steps: 100
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
-  gradient_accumulation_steps: 128
+  gradient_accumulation_steps: 5
   logging_steps: 1
   learning_rate: 0.0002
   num_train_epochs: 2

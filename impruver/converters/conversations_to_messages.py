@@ -16,6 +16,8 @@ def conversations_to_messages(sample: dict) -> list:
     for item in sample['conversations']:
         if item['from'] == 'human':
             role = 'user'
+        elif item['from'] == 'gpt':
+            role = 'assistant'
         elif item['from'] == 'bot':
             role = 'assistant'
         elif item['from'] == 'system':
