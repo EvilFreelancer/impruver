@@ -6,15 +6,14 @@ train_path: ./train.ruGPT35_13B_fcot.jsonl
 val_path: ./val.ruGPT35_13B_fcot.jsonl
 
 datasets:
-#  - name: korotkov/glaive-function-calling-v2-ru-parsed
-#  - name: evilfreelancer/ru-chain-of-thought-sharegpt
-#    converter: impruver.conversations_to_messages
-#  - name: AiCloser/sharegpt_cot_dataset
-#    converter: impruver.conversations_to_messages
-#  - name: IlyaGusev/oasst2_ru_main_branch
-#    converter: impruver.dialog_to_messages
+  - name: korotkov/glaive-function-calling-v2-ru-parsed
+  - name: evilfreelancer/ru-chain-of-thought-sharegpt
+    converter: impruver.conversations_to_messages
+  - name: AiCloser/sharegpt_cot_dataset
+    converter: impruver.conversations_to_messages
+  - name: IlyaGusev/oasst2_ru_main_branch
+    converter: impruver.dialog_to_messages
   - name: MexIvanov/Vezora-Tested-22k-Python-Alpaca-ru
-    split: train[:1]
     converter: impruver.instruction_to_messages
 
 model:
