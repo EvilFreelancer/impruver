@@ -13,8 +13,19 @@ def conversations_to_messages(sample: dict) -> list:
         [{"role": "user", "content": "human text"}, {"role": "assistant", "content": "bot text"}]
     """
     messages = []
+
+    # Add system message if present
+    if 'system' in sample:
+        messages.append({
+            "role": "system",
+            "content": sample['system']
+        })
+
+    # Add conversation messages, fix roles
     for item in sample['conversations']:
-        if item['from'] == 'human':
+        if item['from'] == 'user':
+            role = 'user'
+        elif item['from'] == 'human':
             role = 'user'
         elif item['from'] == 'gpt':
             role = 'assistant'
