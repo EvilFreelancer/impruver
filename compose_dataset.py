@@ -40,7 +40,7 @@ def load_datasets(config, tokenizer, max_tokens_count):
             converter = dynamic_import(dataset['converter'])
 
         # Load the actual dataset from HuggingFace's datasets library.
-        hf_dataset = load_dataset(dataset['name'], split=split)
+        hf_dataset = load_dataset(dataset['name'], split=split, trust_remote_code=True)
 
         # Create an instance of ChatDataset
         chat_dataset = ChatDataset(
