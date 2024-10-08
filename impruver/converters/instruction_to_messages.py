@@ -14,7 +14,6 @@ def instruction_to_messages(sample: dict, skip_labels: list = ["bad_output"]) ->
         [{"role": "user", "content": "instruction text\ninput text"}, {"role": "assistant", "content": "output text"}]
     """
     if "label" in sample and sample["input"] in skip_labels:
-        print(sample)
         return None
     instruction = sample["instruction"]
     if "input" in sample and sample["input"]:
