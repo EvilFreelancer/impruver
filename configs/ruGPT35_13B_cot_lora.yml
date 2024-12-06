@@ -1,5 +1,5 @@
 # Training time
-# - 1x RTX 4090 ~ 20Gb VRAM ~ 11h 8m
+# - 1x RTX 4090 ~ 20Gb VRAM ~ 19m
 
 output_dir: ./models/ruGPT35_13B_lora_cot
 train_path: ./train.ruGPT35_13B_cot.jsonl
