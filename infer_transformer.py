@@ -83,9 +83,9 @@ def generate(model, tokenizer, prompt, generation_config):
 
 
 def infer(
-        config_file: str,
-        output_dir: str = None,
-        seed: int = 42,
+    config_file: str,
+    output_dir: str = None,
+    seed: int = 42,
 ):
     set_seed(seed)
     logging.set_verbosity_info()

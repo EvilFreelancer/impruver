@@ -14,12 +14,12 @@ from impruver.data import DEFAULT_CHAT_TEMPLATE
 
 
 def train(
-        config_file: str,
-        train_path: str = None,
-        val_path: str = None,
-        output_dir: str = None,
-        report_to: str = "none",
-        seed: int = 42,
+    config_file: str,
+    train_path: str = None,
+    val_path: str = None,
+    output_dir: str = None,
+    report_to: str = "none",
+    seed: int = 42,
 ):
     set_seed(seed)
     logging.set_verbosity_info()
