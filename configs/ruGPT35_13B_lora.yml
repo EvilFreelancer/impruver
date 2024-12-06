@@ -34,7 +34,7 @@ lora:
   lora_alpha: 16
   lora_dropout: 0.05
   bias: none
-  target_modules: [ c_attn ]
+  target_modules: [ c_attn, c_fc, c_proj ]
   task_type: CAUSAL_LM
 
 tokenizer:
