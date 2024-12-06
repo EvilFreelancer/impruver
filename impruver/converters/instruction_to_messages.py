@@ -1,24 +1,28 @@
-def instruction_to_messages(sample: dict, skip_labels: list = ["bad_output"]) -> list | None:
+def instruction_to_messages(sample: dict, skip_labels: list = ["bad_output"], mapping: dict = None) -> list | None:
     """
-    Simple function to convert an instruction to a list of messages.
-
-    Example:
-        {"instruction": "instruction text", "input": "input text", "output": "output text"}
+    Convert a dataset sample to a list of messages with optional field mapping.
 
     Args:
-        sample (dict): instruction object in format {"instruction": "text", "input": "text", "output": "text"}
-        skip_labels (list, optional): list of labels to skip, defaults to ["bad_output"]
+        sample (dict): Dataset sample with keys like {"instruction": "text", "input": "text", "output": "text"}.
+        skip_labels (list, optional): List of labels to skip, defaults to ["bad_output"].
+        mapping (dict, optional): Mapping for field names, e.g., {"instruction": "question", "output": "answer"}.
 
     Returns:
-        list: a list of messages compatible with the OpenAI format
-        [{"role": "user", "content": "instruction text\ninput text"}, {"role": "assistant", "content": "output text"}]
+        list | None: List of messages compatible with OpenAI format, or None if sample is skipped.
     """
-    if "label" in sample and sample["input"] in skip_labels:
+    # Apply mapping or use defaults
+    instruction_key = mapping.get("instruction", "instruction") if mapping else "instruction"
+    input_key = mapping.get("input", "input") if mapping else "input"
+    output_key = mapping.get("output", "output") if mapping else "output"
+
+    if "label" in sample and sample.get(input_key) in skip_labels:
         return None
-    instruction = sample["instruction"]
-    if "input" in sample and sample["input"]:
-        instruction += "\n" + sample["input"]
+
+    instruction = sample.get(instruction_key, "")
+    if input_key in sample and sample[input_key]:
+        instruction += "\n" + sample[input_key]
+
     return [
         {"role": "user", "content": instruction},
-        {"role": "assistant", "content": sample["output"]}
+        {"role": "assistant", "content": sample.get(output_key, "")}
     ]
