@@ -1,0 +1,69 @@
+# Training time
+# - 1x RTX 4090 ~ 20Gb VRAM ~ 19m
+
+output_dir: ./models/zephyr-python-ru
+train_path: ./train.zephyr-python-ru.jsonl
+val_path: ./val.zephyr-python-ru.jsonl
+
+datasets:
+  - name: MexIvanov/Vezora-Tested-22k-Python-Alpaca-ru
+    converter: impruver.instruction_to_messages
+    add_global_bos: false
+    add_global_eos: false
+  - name: MexIvanov/CodeExercise-Python-27k-ru
+    converter: impruver.instruction_to_messages
+    add_global_bos: false
+    add_global_eos: false
+  - name: zelkame/ru-stackoverflow-py
+    converter: impruver.instruction_to_messages
+    add_global_bos: false
+    add_global_eos: false
+    mapping:
+      instruction: вопрос
+      output: ответ
+
+model:
+  class: transformers.AutoModelForCausalLM
+  name: HuggingFaceH4/zephyr-7b-beta
+  load_in_4bit: true
+  load_in_8bit: false
+  dtype: float16
+
+lora:
+  r: 64
+  lora_alpha: 16
+  lora_dropout: 0.05
+  bias: none
+  target_modules: [ v_proj, q_proj ]
+  task_type: CAUSAL_LM
+
+tokenizer:
+  class: transformers.AutoTokenizer
+  name: HuggingFaceH4/zephyr-7b-beta
+  max_tokens_count: 1200
+
+trainer:
+  eval_strategy: steps
+  save_strategy: steps
+  eval_steps: 500
+  save_steps: 500
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 5
+  logging_steps: 20
+  learning_rate: 0.0002
+  num_train_epochs: 3
+  lr_scheduler_type: cosine
+  warmup_steps: 16
+  optim: adamw_8bit
+  metric_for_best_model: eval_loss
+  load_best_model_at_end: true
+  save_total_limit: 2
+  seed: 42
+  remove_unused_columns: false
+  max_grad_norm: 1.0
+  weight_decay: 0.08
+  torch_compile: false
+
+#ddp:
+#  ddp_find_unused_parameters: false
