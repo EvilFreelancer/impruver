@@ -1,4 +1,5 @@
 import json
+import inspect
 from typing import List, Dict, Callable, Optional
 
 from mpmath import primepi
@@ -17,17 +18,18 @@ logging.set_verbosity_info()
 
 class ChatDataset(Dataset):
     def __init__(
-            self,
-            original_records: List[Dict],
-            tokenizer,
-            max_tokens_count: int,
-            add_global_bos: bool = True,
-            add_global_eos: bool = True,
-            labels_pad_token_id: int = -100,
-            converter: Optional[Callable[[Dict], List[Dict]]] = None,
-            strategy_function: Optional[Callable[[List[Dict]], List[Dict]]] = None,
-            chat_template: Optional[str] = None,
-            only_target_loss: bool = False,
+        self,
+        original_records: List[Dict],
+        tokenizer,
+        max_tokens_count: int,
+        add_global_bos: bool = True,
+        add_global_eos: bool = True,
+        labels_pad_token_id: int = -100,
+        converter: Optional[Callable[[Dict], List[Dict]]] = None,
+        strategy_function: Optional[Callable[[List[Dict]], List[Dict]]] = None,
+        chat_template: Optional[str] = None,
+        only_target_loss: bool = False,
+        mapping: Optional[Dict[str, str]] = None,
     ):
         self.original_records = original_records
         self.tokenizer = tokenizer
@@ -39,6 +41,7 @@ class ChatDataset(Dataset):
         self.strategy_function = strategy_function
         self.chat_template = chat_template
         self.only_target_loss = only_target_loss
+        self.mapping = mapping
         self.is_printed = False
 
         self.records = []
@@ -54,11 +57,11 @@ class ChatDataset(Dataset):
     def __getitem__(self, index):
         return self.records[index]
 
-    def get_tokens(self, messages):
+    def get_tokens(self, messages) -> List[int]:
         if (
-                hasattr(self.tokenizer, 'apply_chat_template')
-                and hasattr(self.tokenizer, 'chat_template')
-                and self.tokenizer.chat_template is not None
+            hasattr(self.tokenizer, 'apply_chat_template')
+            and hasattr(self.tokenizer, 'chat_template')
+            and self.tokenizer.chat_template is not None
         ):
             tokens = self.tokenizer.apply_chat_template(
                 messages,
@@ -78,11 +81,14 @@ class ChatDataset(Dataset):
                 tokenizer=self.tokenizer,
             )
 
-        return tokens[0]
+        return tokens
 
     def convert_record(self, record):
         if self.converter:
-            messages = self.converter(record)
+            if self.mapping is not None:
+                messages = self.converter(record, mapping=self.mapping)
+            else:
+                messages = self.converter(record)
         else:
             messages = record["messages"]
             if isinstance(record["messages"], str):
@@ -117,7 +123,10 @@ class ChatDataset(Dataset):
                 else:
                     labels += [self.labels_pad_token_id] * len(message_tokens)
         else:
-            labels = input_ids.tolist()
+            labels = input_ids
+
+        # Convert to tensors
+        input_ids = torch.LongTensor(input_ids)
 
         # Add global BOS and EOS tokens if specified
         if self.add_global_bos and input_ids[0] != self.tokenizer.bos_token_id:
@@ -135,10 +144,10 @@ class ChatDataset(Dataset):
 
         # Ensure lengths are consistent
         assert (
-                input_ids.size(0)
-                == labels.size(0)
-                == attention_mask.size(0)
-                <= self.max_tokens_count
+            input_ids.size(0)
+            == labels.size(0)
+            == attention_mask.size(0)
+            <= self.max_tokens_count
         )
 
         # Print sample once for verification

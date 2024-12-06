@@ -25,7 +25,7 @@ def calc_fingerprint(tokens, num_perm=128):
 
 def load_datasets(config, tokenizer, max_tokens_count):
     """
-    Load datasets specified in the config and return a list of records
+    Load datasets specified in the config and return a list of records.
     """
     all_records = []
     for dataset in config['datasets']:
@@ -47,6 +47,9 @@ def load_datasets(config, tokenizer, max_tokens_count):
             original_records=list(hf_dataset),
             tokenizer=tokenizer,
             converter=converter,
+            mapping=dataset.get("mapping", None),
+            add_global_bos=dataset.get("add_global_bos", True),
+            add_global_eos=dataset.get("add_global_eos", True),
             only_target_loss=dataset.get("only_target_loss", True),
             max_tokens_count=dataset.get("max_tokens_count", max_tokens_count),
         )
