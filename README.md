@@ -60,8 +60,8 @@ pip install -r requirements.txt
 
 | Модель                                                                       | Тип модели    | Конфигурации                                                                               |
 |------------------------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------|
-| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | Saiga 2       | [lora](/configs/ruGPT35_13B_lora.yml)                                                      |
-| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | function call | [lora](/configs/ruGPT35_13B_fc_lora.yml)                                                   |
+| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | Saiga 2       | [lora](/configs/ruGPT35_13B_lora.yaml)                                                      |
+| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | function call | [lora](/configs/ruGPT35_13B_fc_lora.yaml)                                                   |
 | [nanoGPT](https://github.com/karpathy/nanoGPT) (обучение с нуля)             | Alpaca        | [full-train](/configs/nanoGPT_full.yaml)                                                   |
 | [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | Saiga 2       | [full-train](/configs/rugpt3large_full.yaml), [lora](/configs/rugpt3large_lora.yaml)       |
 | [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | function call | [full-train](/configs/rugpt3large_fc_full.yaml), [lora](/configs/rugpt3large_fc_lora.yaml) |
