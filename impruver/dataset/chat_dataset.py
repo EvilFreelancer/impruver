@@ -81,7 +81,7 @@ class ChatDataset(Dataset):
                 tokenizer=self.tokenizer,
             )
 
-        return tokens
+        return tokens.tolist()[0]
 
     def convert_record(self, record):
         if self.converter:
@@ -125,16 +125,13 @@ class ChatDataset(Dataset):
         else:
             labels = input_ids
 
-        # Convert to tensors
-        input_ids = torch.LongTensor(input_ids)
-
         # Add global BOS and EOS tokens if specified
         if self.add_global_bos and input_ids[0] != self.tokenizer.bos_token_id:
-            input_ids = torch.cat((torch.tensor([self.tokenizer.bos_token_id]), input_ids), dim=-1)
+            input_ids = torch.cat(([self.tokenizer.bos_token_id], input_ids), dim=-1)
             labels = [self.labels_pad_token_id] + labels
 
         if self.add_global_eos and input_ids[-1] != self.tokenizer.eos_token_id:
-            input_ids = torch.cat((input_ids, torch.tensor([self.tokenizer.eos_token_id])), dim=-1)
+            input_ids = torch.cat((input_ids, [self.tokenizer.eos_token_id]), dim=-1)
             labels += [self.tokenizer.eos_token_id]
 
         # Convert to tensors
