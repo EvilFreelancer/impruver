@@ -81,7 +81,9 @@ class ChatDataset(Dataset):
                 tokenizer=self.tokenizer,
             )
 
-        return tokens.tolist()[0]
+        if not isinstance(tokens, list):
+            return tokens.tolist()[0]
+        return tokens
 
     def convert_record(self, record):
         if self.converter:
