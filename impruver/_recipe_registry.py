@@ -59,11 +59,13 @@ def parse_config_filename(filename: str) -> Optional[Config]:
     dataset = "_".join(parts[idx:]) if idx < len(parts) else ""
 
     # Формируем удобочитаемое имя конфига
-    config_name = f"{model}/{training_type}"
+    config_name = f"{model}/"
     if size:
-        config_name += f"_{size}"
+        config_name += f"{size}"
     if dataset:
-        config_name += f"_{dataset}"
+        if not config_name.endswith("/"):
+            config_name += f"_"
+        config_name += f"{dataset}"
 
     file_path = os.path.join("configs", filename)
     return Config(name=config_name, file_path=file_path)
@@ -112,6 +114,7 @@ if __name__ == "__main__":
     for recipe in recipes:
         print(f"\nRecipe: {recipe.name}")
         print(f"  Script: {recipe.file_path}")
+        print(f"  Distributed: {recipe.supports_distributed}")
         print("  Configs:")
         for conf in recipe.configs:
             print(f"    - {conf.name}  ->  {conf.file_path}")
