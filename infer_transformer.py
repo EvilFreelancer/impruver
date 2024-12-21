@@ -86,6 +86,7 @@ def infer(
     config_file: str,
     output_dir: str = None,
     seed: int = 42,
+    history_limit: int = 10,
 ):
     set_seed(seed)
     logging.set_verbosity_info()
@@ -196,13 +197,13 @@ def infer(
     #
 
     # Start chat loop
-    chat_history = ChatHistory(history_limit=10)
+    chat_history = ChatHistory(history_limit=history_limit)
     while True:
         user_message = input("User: ")
 
         # Reset chat command
         if user_message.strip() == "/reset":
-            chat_history = ChatHistory(history_limit=10)
+            chat_history = ChatHistory(history_limit=history_limit)
             print("History reset completed!")
             continue
 
