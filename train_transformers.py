@@ -163,7 +163,7 @@ def train(
 
         # First we need to check if we have a default generation config in model
         if hasattr(model, "generation_config") and model.generation_config is not None:
-            generation_config = model.generation_config.__dict__
+            generation_config = model.generation_config.to_diff_dict()
         else:
             generation_config = {"repetition_penalty": 1.0, "do_sample": True}
         # Next let's save a default generation config
