@@ -1,6 +1,6 @@
-output_dir: ./models/rugpt3medium_full
-train_path: ./train.rugpt3medium.jsonl
-val_path: ./val.rugpt3medium.jsonl
+output_dir: ./models/rugpt3medium_full_saiga2
+train_path: ./train.rugpt3medium_saiga2.jsonl
+val_path: ./val.rugpt3medium_saiga2.jsonl
 
 datasets:
   - name: IlyaGusev/ru_turbo_alpaca

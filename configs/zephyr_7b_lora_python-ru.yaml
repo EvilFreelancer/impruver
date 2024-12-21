@@ -1,9 +1,6 @@
-# Training time
-# - 1x RTX 4090 ~ 20Gb VRAM ~ 19m
-
-output_dir: ./models/zephyr-python-ru
-train_path: ./train.zephyr-python-ru.jsonl
-val_path: ./val.zephyr-python-ru.jsonl
+output_dir: ./models/zephyr_7b_lora_python-ru
+train_path: ./train.zephyr_7b_lora_python-ru.jsonl
+val_path: ./val.zephyr_7b_lora_python-ru.jsonl
 
 datasets:
   - name: MexIvanov/Vezora-Tested-22k-Python-Alpaca-ru

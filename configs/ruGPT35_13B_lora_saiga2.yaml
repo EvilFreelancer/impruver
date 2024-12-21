@@ -1,9 +1,9 @@
 # Training time
 # - 1x RTX 4090 ~ 18.2GiB VRAM ~ 16h 58m
 
-output_dir: ./models/ruGPT35_13B_lora
-train_path: ./train.ruGPT35_13B.jsonl
-val_path: ./val.ruGPT35_13B.jsonl
+output_dir: ./models/ruGPT35_13B_lora_saiga2
+train_path: ./train.ruGPT35_13B_saiga2.jsonl
+val_path: ./val.ruGPT35_13B_saiga2.jsonl
 
 datasets:
   - name: IlyaGusev/ru_turbo_alpaca

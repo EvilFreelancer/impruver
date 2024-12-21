@@ -1,4 +1,4 @@
-output_dir: ./models/rugpt3small_toxicator_full
+output_dir: ./models/rugpt3small_full_toxicator
 train_path: ./train.rugpt3small_toxicator.jsonl
 val_path: ./val.rugpt3small_toxicator.jsonl
 

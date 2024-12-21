@@ -1,6 +1,6 @@
-output_dir: ./models/nanoGPT_full
-train_path: ./train.nanoGPT.jsonl
-val_path: ./val.nanoGPT.jsonl
+output_dir: ./models/nanoGPT_full_alpaca
+train_path: ./train.nanoGPT_alpaca.jsonl
+val_path: ./val.nanoGPT_alpaca.jsonl
 
 datasets:
   - name: IlyaGusev/ru_turbo_alpaca

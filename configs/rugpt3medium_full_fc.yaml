@@ -1,4 +1,4 @@
-output_dir: ./models/rugpt3medium_fc_full
+output_dir: ./models/rugpt3medium_full_fc
 train_path: ./train.rugpt3medium_fc.jsonl
 val_path: ./val.rugpt3medium_fc.jsonl
 
