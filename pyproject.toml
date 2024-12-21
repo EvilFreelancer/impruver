@@ -10,35 +10,44 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     # Core
-    "pydantic>=2.9.2",
+    "pydantic>=2.10.4",
     "pyyaml>=6.0.2",
     "jsonlines>=4.0.0",
-    "fire>=0.6.0",
+    "fire>=0.7.0",
     "datasketch>=1.6.5",
+
     # Hugging Face integrations
-    "torch>=2.4.1",
-    "datasets>=3.0.1",
-    "transformers>=4.45.1",
-    "huggingface-hub>=0.25.1",
+    "torch>=2.5.1",
+    "datasets>=3.2.0",
+    "transformers>=4.47.1",
+    "huggingface-hub>=0.27.0",
     "safetensors>=0.4.5",
+    "zstandard>=0.23.0",
+
     # Tokenization
-    "tokenizers>=0.20.0",
+    "tokenizers>=0.21.0",
+
     # Miscellaneous
-    "tqdm>=4.66.5",
+    "tqdm>=4.67.1",
+
     # Quantization
-    "bitsandbytes>=0.44.0",
-    "peft>=0.13.0",
-    "accelerate>=0.34.2"
+    "bitsandbytes>=0.45.0",
+    "peft>=0.14.0",
+    "accelerate>=1.2.1"
 ]
 dynamic = ["version"]
+
+[project.urls]
+GitHub = "https://github.com/EvilFreelancer/impruver"
+Issues = "https://github.com/EvilFreelancer/impruver/issues"
 
 #[project.scripts]
 #impruver = "impruver.cli:main"
 
 [project.optional-dependencies]
 dev = [
-    "wandb>=0.18.2",
-    "tiktoken>=0.7.0",
+    "wandb>=0.19.1",
+    "tiktoken>=0.8.0",
 ]
 
 [tool.setuptools.dynamic]
@@ -50,11 +59,24 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = [""]
-include = ["impruver*"]
+include = ["impruver*", "recipes*"]
 
 [tool.setuptools.package-data]
-recipes = ["configs/*.yaml", "configs/*/*.yaml"]
+recipes = ["configs/*.yaml", "configs/*/*.yaml", "configs/*/*/*.yaml"]
 
-#[tool.pytest.ini_options]
-#addopts = ["--showlocals", "--import-mode=prepend", "--without-integration", "--without-slow-integration"]
-#addopts = ["--showlocals", "--import-mode=prepend"]
+[tool.usort]
+first_party_detection = false
+
+[tool.black]
+target-version = ["py38"]
+
+[tool.pydoclint]
+style = 'google'
+check-return-types = 'False'
+
+[tool.pytest.ini_options]
+addopts = ["--showlocals", "--import-mode=prepend", "--without-integration", "--without-slow-integration"]
+# --showlocals will show local variables in tracebacks
+# --import-mode=prepend will add the root (the parent dir of torchtune/, tests/, recipes/)
+# to `sys.path` when invoking pytest, allowing us to treat `tests` as a package within the tests.
+# --without-integration and --without-slow-integration: default to running unit tests only
