@@ -1,4 +1,4 @@
-# impruver
+# Impruver: Фреймворк для обучения Больших Языковых Моделей (LLM) 
 
 Набор скриптов и конфигураций для самостоятельного обучения Больших Языковых Моделей (БЯМ) или же на английском Large
 Language Models (LLM).
@@ -54,23 +54,24 @@ pip install -r requirements.txt
 
 ## Доступные конфигурации
 
-В директории [configs](/configs) имеется набор готовых конфигураций, каждый из них оптимизирован на запуска на одной
-видеокарте, память которой равен 24Гб, хотя маленькие модели можно обучать и на меньших объёмах памяти просто
-уменьшая размер батча.
+В директории [configs](/recipes/configs) имеется набор готовых конфигураций, каждый из них оптимизирован для обучения модели на
+одной видеокарте, память которой равна 24Гб, хотя маленькие модели можно обучать и на меньших объёмах памяти просто
+уменьшая размер `*_batch_size` и `gradient_steps`.
 
-| Модель                                                                       | Тип модели    | Конфигурации                                                                               |
-|------------------------------------------------------------------------------|---------------|--------------------------------------------------------------------------------------------|
-| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | Saiga 2       | [lora](/configs/ruGPT35_13B_lora.yaml)                                                      |
-| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | function call | [lora](/configs/ruGPT35_13B_fc_lora.yaml)                                                   |
-| [nanoGPT](https://github.com/karpathy/nanoGPT) (обучение с нуля)             | Alpaca        | [full-train](/configs/nanoGPT_full.yaml)                                                   |
-| [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | Saiga 2       | [full-train](/configs/rugpt3large_full.yaml), [lora](/configs/rugpt3large_lora.yaml)       |
-| [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | function call | [full-train](/configs/rugpt3large_fc_full.yaml), [lora](/configs/rugpt3large_fc_lora.yaml) |
-| [rugpt3medium](https://huggingface.co/ai-forever/rugpt3medium_based_on_gpt2) | Saiga 2       | [full-train](/configs/rugpt3medium_full.yaml)                                              |
-| [rugpt3medium](https://huggingface.co/ai-forever/rugpt3medium_based_on_gpt2) | function call | [full-train](/configs/rugpt3medium_fc_full.yaml)                                           |
-| [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | Saiga 2       | [full-train](/configs/rugpt3small_full.yaml)                                               |
-| [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | function call | [full-train](/configs/rugpt3small_fc_full.yaml)                                            |
+| Модель                                                                       | Тип модели                                                                   | Конфигурации                                                                                               |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | Saiga 2                                                                      | [lora](/recipes/configs/ruGPT35_13B_lora.yaml)                                                             |
+| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | function call                                                                | [lora](/recipes/configs/ruGPT35_13B_fc_lora.yaml)                                                          |
+| [nanoGPT](https://github.com/karpathy/nanoGPT) (обучение с нуля)             | Alpaca                                                                       | [full-train](/recipes/configs/nanoGPT_full.yaml)                                                           |
+| [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | Saiga 2                                                                      | [full-train](/recipes/configs/rugpt3large_full.yaml), [lora](/recipes/configs/rugpt3large_lora.yaml)       |
+| [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | function call                                                                | [full-train](/recipes/configs/rugpt3large_fc_full.yaml), [lora](/recipes/configs/rugpt3large_fc_lora.yaml) |
+| [rugpt3medium](https://huggingface.co/ai-forever/rugpt3medium_based_on_gpt2) | Saiga 2                                                                      | [full-train](/recipes/configs/rugpt3medium_full.yaml)                                                      |
+| [rugpt3medium](https://huggingface.co/ai-forever/rugpt3medium_based_on_gpt2) | function call                                                                | [full-train](/recipes/configs/rugpt3medium_fc_full.yaml)                                                   |
+| [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | Saiga 2                                                                      | [full-train](/recipes/configs/rugpt3small_full.yaml)                                                       |
+| [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | function call                                                                | [full-train](/recipes/configs/rugpt3small_fc_full.yaml)                                                    |
+| [zephyr-7b-beta](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta)        | [zephyr-python-ru](https://huggingface.co/MexIvanov/zephyr-python-ru) analog | [lora](/recipes/configs/zephyr-python-ru_7b_lora.yaml)                                                     |
 
-Подробнее о том из чего состоят конфигурации и как их описывать сказано в [документации](/docs/configuration.md).
+Подробнее о том из чего состоят конфигурации и как их описывать сказано в [документации](/docs/Конфигурация).
 
 ## Сборка датасета
 
@@ -143,3 +144,18 @@ accelerate launch train_transformers.py configs/ruGPT35_13B_lora.yaml
 Опция `--report-to=wandb` в таком формате тоже поддерживается.
 
 Далее смотрите в `nvidia-smi` или `nvitop`, модель должна будет запуститься и разлиться на все видеокарты.
+
+## Лицензия
+
+Этот проект лицензирован под лицензией `MIT`. Подробности см. в файле [LICENSE](./LICENSE).
+
+## Цитирование
+
+```
+@misc{impruver2024sources,
+    author       = {Pavel Rykov},
+    title        = {{Impruver: Framework for Training Large Language Models}},
+    howpublished = {\url{https://github.com/EvilFreelancer/impruver}},
+    year         = {2024}
+}
+```
