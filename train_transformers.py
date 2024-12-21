@@ -2,6 +2,7 @@ import os
 import random
 import fire
 import yaml
+import json
 
 import wandb
 import torch
@@ -158,6 +159,17 @@ def train(
     if lora_config:
         lora_config = LoraConfig(**lora_config)
         model = get_peft_model(model, lora_config)
+        model.print_trainable_parameters()
+
+        # First we need to check if we have a default generation config in model
+        if hasattr(model, "generation_config") and model.generation_config is not None:
+            generation_config = model.generation_config.__dict__
+        else:
+            generation_config = {"repetition_penalty": 1.0, "do_sample": True}
+        # Next let's save a default generation config
+        generation_config_path = os.path.join(output_dir, "generation_config.json")
+        with open(generation_config_path, "w", encoding="utf-8") as f:
+            json.dump(generation_config, f, ensure_ascii=False, default=lambda o: o.__dict__, indent=2)
 
     #
     # Trainer
@@ -166,6 +178,9 @@ def train(
     # Merge trainer_config and ddp_config
     training_args_dict = trainer_config.copy()
     training_args_dict.update(ddp_config)
+
+    # Fixing "evaL_loss" issue
+    training_args_dict.update({"label_names": ["labels"]})
 
     # If reporting to W&B is enabled
     if trainer_config.get("report_to", None) == "wandb":
