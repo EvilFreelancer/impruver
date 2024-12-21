@@ -162,6 +162,7 @@ def infer(
     generation_config = GenerationConfig.from_pretrained(output_dir)
     generation_config.max_new_tokens = 200
     generation_config.repetition_penalty = 1.2
+    generation_config.do_sample = True
 
     # Attention implementation
     attn_implementation = None

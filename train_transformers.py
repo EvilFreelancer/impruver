@@ -165,7 +165,7 @@ def train(
         if hasattr(model, "generation_config") and model.generation_config is not None:
             generation_config = model.generation_config.to_diff_dict()
         else:
-            generation_config = {"repetition_penalty": 1.0, "do_sample": True}
+            generation_config = {"max_new_tokens": 200, "repetition_penalty": 1.2, "do_sample": True}
         # Next let's save a default generation config
         generation_config_path = os.path.join(output_dir, "generation_config.json")
         with open(generation_config_path, "w", encoding="utf-8") as f:
