@@ -20,7 +20,7 @@ jobs:
           git clone https://x-access-token:${{ secrets.WIKI_TOKEN }}@github.com/EvilFreelancer/impruver.wiki.git wiki
       - name: Copy docs to wiki
         run: |
-          cp -R docs/* wiki/
+          cp -Rv docs/* wiki/
       - name: Commit and push changes
         working-directory: wiki
         run: |
