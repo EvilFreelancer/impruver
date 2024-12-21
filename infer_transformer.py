@@ -27,8 +27,8 @@ DEFAULT_SYSTEM_PROMPT = f"Ты полезный помощник с доступ
 class ChatHistory:
     def __init__(self, history_limit: int = None):
         self.history_limit = history_limit
-        self.system_prompt = DEFAULT_SYSTEM_PROMPT
-        # self.system_prompt = None
+        # self.system_prompt = DEFAULT_SYSTEM_PROMPT
+        self.system_prompt = None
         self.messages = []
         if self.system_prompt is not None:
             self.messages.append({"role": "system", "content": self.system_prompt})
@@ -160,7 +160,7 @@ def infer(
 
     # Generator config
     generation_config = GenerationConfig.from_pretrained(output_dir)
-    generation_config.max_new_tokens = 2048
+    generation_config.max_new_tokens = 200
     generation_config.repetition_penalty = 1.2
 
     # Attention implementation
@@ -174,6 +174,7 @@ def infer(
     # Read model from folder with trained checkpoints
     model = model_obj.from_pretrained(
         output_dir,
+        generation_config=generation_config,
         quantization_config=quantization_config,
         device_map=None if ddp_config else "auto",  # need to be disabled for DDP
         torch_dtype=dtype,
