@@ -59,12 +59,12 @@ def parse_config_filename(filename: str) -> Optional[Config]:
     dataset = "_".join(parts[idx:]) if idx < len(parts) else ""
 
     # Формируем удобочитаемое имя конфига
-    config_name = f"{model}/"
+    config_name = f"{training_type}/{model}/"
     if size:
+        if not config_name.endswith("/"): config_name += f"_"
         config_name += f"{size}"
     if dataset:
-        if not config_name.endswith("/"):
-            config_name += f"_"
+        if not config_name.endswith("/"): config_name += f"_"
         config_name += f"{dataset}"
 
     file_path = os.path.join("configs", filename)
