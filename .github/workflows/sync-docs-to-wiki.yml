@@ -21,6 +21,11 @@ jobs:
       - name: Copy docs to wiki
         run: |
           cp -Rv docs/* wiki/
+      - name: Fix relative links
+        working-directory: wiki
+        run: |
+          find . -type f -name '*.md' -exec \
+            sed -i -E 's|\(([^)]*)\)\[([^]]*)\]|[\1](https://github.com/EvilFreelancer/impruver/blob/main/\2)|g' {} +
       - name: Commit and push changes
         working-directory: wiki
         run: |
