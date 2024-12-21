@@ -69,7 +69,7 @@ pip install -r requirements.txt
 | [rugpt3medium](https://huggingface.co/ai-forever/rugpt3medium_based_on_gpt2) | function call                                                                | [full-train](/configs/rugpt3medium_full_fc.yaml)                                                   |
 | [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | Saiga 2                                                                      | [full-train](/configs/rugpt3small_full_saiga2.yaml)                                                |
 | [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | function call                                                                | [full-train](/configs/rugpt3small_full_fc.yaml)                                                    |
-| [zephyr-7b-beta](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta)        | [zephyr-python-ru](https://huggingface.co/MexIvanov/zephyr-python-ru) analog | [lora](/configs/zephyr_7b_lora_python-ru.yaml)                                                     |
+| [zephyr-7b-beta](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta)        | [zephyr-python-ru](https://huggingface.co/MexIvanov/zephyr-python-ru) analog | [lora](/configs/zephyr_7B_lora_python-ru.yaml)                                                     |
 
 Подробнее о том из чего состоят конфигурации и как их описывать сказано в [документации](/docs/Конфигурация).
 
