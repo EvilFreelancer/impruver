@@ -1,0 +1,31 @@
+name: Sync docs to Wiki
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  sync_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v2
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Clone wiki repo
+        run: |
+          git clone https://x-access-token:${{ secrets.WIKI_TOKEN }}@github.com/EvilFreelancer/impruver.wiki.git wiki
+      - name: Copy docs to wiki
+        run: |
+          cp -R docs/* wiki/
+      - name: Commit and push changes
+        working-directory: wiki
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "chore: auto-update wiki from docs"
+          else
+            echo "No changes to commit"
