@@ -34,13 +34,16 @@ def load_datasets(config, tokenizer, max_tokens_count):
         # If split was specified in the config, then use it
         split = dataset.get('split', 'train')
 
+        # If subset (called "name" in load_dataset) was specified in the config, then use it, otherwise use None
+        subset = dataset.get('subset', None)
+
         # Some datasets have a converter function
         converter = None
         if 'converter' in dataset:
             converter = dynamic_import(dataset['converter'])
 
         # Load the actual dataset from HuggingFace's datasets library.
-        hf_dataset = load_dataset(dataset['name'], split=split, trust_remote_code=True)
+        hf_dataset = load_dataset(dataset['name'], name=subset, split=split, trust_remote_code=True)
 
         # Create an instance of ChatDataset
         chat_dataset = ChatDataset(
