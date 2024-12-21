@@ -4,7 +4,7 @@
 Language Models (LLM).
 
 Вдохновлён проектами: [saiga](https://github.com/IlyaGusev/saiga),
-[torchtune](https://github.com/pytorch/torchtune),
+[impruver](https://github.com/EvilFreelancer/impruver),
 [nanoGPT](https://github.com/karpathy/nanoGPT).
 
 Обладает следующими возможностями:
