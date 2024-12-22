@@ -24,7 +24,7 @@ model:
   name: HuggingFaceH4/zephyr-7b-beta
   load_in_4bit: true
   load_in_8bit: false
-  dtype: float16
+  dtype: fp16
 
 lora:
   r: 64
