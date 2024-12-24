@@ -1,6 +1,4 @@
-from typing import List, Protocol, Set
-
-from .message import Message
+from typing import List, Protocol, Set, Dict
 
 
 class Tokenizer(Protocol):
@@ -30,7 +28,7 @@ class Tokenizer(Protocol):
         Given a list of token ids, return the decoded text
         """
 
-    def apply_chat_template(self, token_ids: List[Message], **kwargs):
+    def apply_chat_template(self, token_ids: List[Dict], **kwargs):
         """
         Given a list of messages, return a list of tokens for the concatenated
         and formatted message

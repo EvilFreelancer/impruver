@@ -25,7 +25,7 @@ DEFAULT_CHAT_TEMPLATE = (
 
 
 def apply_chat_template(
-        conversation: List[dict],
+        conversation: List[Dict],
         chat_template: Optional[str] = None,
         add_special_tokens: bool = False,
         add_generation_prompt: Optional[bool] = False,

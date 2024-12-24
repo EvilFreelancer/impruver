@@ -1,9 +1,9 @@
 # Training time
 # - 1x RTX 4090 ~ 20Gb VRAM ~ 19m
 
-output_dir: ./models/ruGPT35_13B_lora_cot
-train_path: ./train.ruGPT35_13B_cot.jsonl
-val_path: ./val.ruGPT35_13B_cot.jsonl
+output_dir: ./models/ruGPT-3.5_13B_lora_cot
+train_path: ./train.ruGPT-3.5_13B_cot.jsonl
+val_path: ./val.ruGPT-3.5_13B_cot.jsonl
 
 datasets:
   - name: evilfreelancer/ru-chain-of-thought-sharegpt

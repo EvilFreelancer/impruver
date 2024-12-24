@@ -63,18 +63,18 @@ pip install -r requirements.txt
 модели на одной видеокарте, память которой равна 24Гб, хотя маленькие модели можно обучать и на меньших объёмах памяти
 просто уменьшая размер `per_device_*_batch_size` и/или `gradient_accumulation_steps`.
 
-| Модель                                                                       | Тип модели                                                                   | Конфигурации                                                                                       |
-|------------------------------------------------------------------------------|------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | Saiga 2                                                                      | [lora](/configs/ruGPT35_13B_lora_saiga2.yaml)                                                      |
-| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)              | function call                                                                | [lora](/configs/ruGPT35_13B_lora_fc.yaml)                                                          |
-| [nanoGPT](https://github.com/karpathy/nanoGPT) (обучение с нуля)             | Alpaca                                                                       | [full-train](/configs/nanoGPT_full_alpaca.yaml)                                                    |
-| [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | Saiga 2                                                                      | [full-train](/configs/rugpt3large_full_saiga2.yaml), [lora](/configs/rugpt3large_lora_saiga2.yaml) |
-| [rugpt3large](https://huggingface.co/ai-forever/rugpt3large_based_on_gpt2)   | function call                                                                | [full-train](/configs/rugpt3large_full_fc.yaml), [lora](/configs/rugpt3large_lora_fc.yaml)         |
-| [rugpt3medium](https://huggingface.co/ai-forever/rugpt3medium_based_on_gpt2) | Saiga 2                                                                      | [full-train](/configs/rugpt3medium_full_saiga2.yaml)                                               |
-| [rugpt3medium](https://huggingface.co/ai-forever/rugpt3medium_based_on_gpt2) | function call                                                                | [full-train](/configs/rugpt3medium_full_fc.yaml)                                                   |
-| [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | Saiga 2                                                                      | [full-train](/configs/rugpt3small_full_saiga2.yaml)                                                |
-| [rugpt3small](https://huggingface.co/ai-forever/rugpt3small_based_on_gpt2)   | function call                                                                | [full-train](/configs/rugpt3small_full_fc.yaml)                                                    |
-| [zephyr-7b-beta](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta)        | [zephyr-python-ru](https://huggingface.co/MexIvanov/zephyr-python-ru) analog | [lora](/configs/zephyr_7B_lora_python-ru.yaml)                                                     |
+| Модель                                                                | Тип модели                                                                   | Конфигурации                                                                                                 |
+|-----------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)       | Saiga 2                                                                      | [lora](/configs/ruGPT-3.5/13B_lora_saiga2.yaml)                                                              |
+| [ruGPT3.5-13B](https://huggingface.co/ai-forever/ruGPT-3.5-13B)       | function call                                                                | [lora](/configs/ruGPT-3.5/13B_lora_fc.yaml)                                                                  |
+| [nanoGPT](https://github.com/karpathy/nanoGPT) (обучение с нуля)      | Alpaca                                                                       | [full-train](/configs/nanoGPT/30M_full_alpaca.yaml)                                                          |
+| [rugpt3large](https://huggingface.co/ai-forever/based_on_gpt2)        | Saiga 2                                                                      | [full-train](/configs/rugpt3large/760M_full_saiga2.yaml), [lora](/configs/rugpt3large/760M_lora_saiga2.yaml) |
+| [rugpt3large](https://huggingface.co/ai-forever/based_on_gpt2)        | function call                                                                | [full-train](/configs/rugpt3large/760M_full_fc.yaml), [lora](/configs/rugpt3large/760M_lora_fc.yaml)         |
+| [rugpt3medium](https://huggingface.co/ai-forever/based_on_gpt2)       | Saiga 2                                                                      | [full-train](/configs/rugpt3medium/457M_full_saiga2.yaml)                                                    |
+| [rugpt3medium](https://huggingface.co/ai-forever/based_on_gpt2)       | function call                                                                | [full-train](/configs/rugpt3medium/457M_full_fc.yaml)                                                        |
+| [rugpt3small](https://huggingface.co/ai-forever/based_on_gpt2)        | Saiga 2                                                                      | [full-train](/configs/rugpt3small/125M_full_saiga2.yaml)                                                     |
+| [rugpt3small](https://huggingface.co/ai-forever/based_on_gpt2)        | function call                                                                | [full-train](/configs/rugpt3small/125M_full_fc.yaml)                                                         |
+| [zephyr-7b-beta](https://huggingface.co/HuggingFaceH4/zephyr-7b-beta) | [zephyr-python-ru](https://huggingface.co/MexIvanov/zephyr-python-ru) analog | [lora](/configs/zephyr/zephyr_7B_lora_python-ru.yaml)                                                        |
 
 Подробнее о том из чего состоят конфигурации и как их описывать сказано
 в [документации](https://github.com/EvilFreelancer/impruver/wiki).
@@ -85,7 +85,7 @@ pip install -r requirements.txt
 его на тренировочный и валидационный наборы сэмплов. Все эти задачи можно выполнить следующей командой:
 
 ```shell
-python3 compose_dataset.py configs/ruGPT35_13B_lora_saiga2.yaml
+python3 compose_dataset.py configs/ruGPT-3.5/13B_lora_saiga2.yaml
 ```
 
 ## Обучение на одной машине с одной видеокартой
@@ -93,14 +93,14 @@ python3 compose_dataset.py configs/ruGPT35_13B_lora_saiga2.yaml
 Запускаем обучение модели вот так:
 
 ```shell
-python3 train_transformers.py configs/ruGPT35_13B_lora_saiga2.yaml
+python3 train_transformers.py configs/ruGPT-3.5/13B_lora_saiga2.yaml
 ```
 
 Скрипт тренировки поддерживает режим отправки логов в Weights and Biases, но по умолчанию данный функционал отключен,
 для того чтобы включить данный функционал нужно добавить опцию `--report-to=wandb` в команду запуска обучения:
 
 ```shell
-python3 train_transformers.py configs/ruGPT35_13B_lora_saiga2.yaml --report-to=wandb
+python3 train_transformers.py configs/ruGPT-3.5/13B_lora_saiga2.yaml --report-to=wandb
 ```
 
 ## Инференс обученной модели
@@ -108,7 +108,7 @@ python3 train_transformers.py configs/ruGPT35_13B_lora_saiga2.yaml --report-to=w
 По завершению обучения можно взять интерактивный чат
 
 ```shell
-python3 infer_transformer.py configs/ruGPT35_13B_lora_saiga2.yaml
+python3 infer_transformer.py configs/ruGPT-3.5/13B_lora_saiga2.yaml
 ```
 
 ## Обучение в режиме (D)DP - (Distributed) Data Parallel
@@ -145,7 +145,7 @@ ddp:
 После этого можно будет запустить обучение:
 
 ```shell
-accelerate launch train_transformers.py configs/ruGPT35_13B_lora_saiga2.yaml
+accelerate launch train_transformers.py configs/ruGPT-3.5/13B_lora_saiga2.yaml
 ```
 
 Опция `--report-to=wandb` в таком формате тоже поддерживается.

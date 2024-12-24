@@ -2,7 +2,8 @@ import yaml
 import fire
 import json
 import random
-
+import argparse
+import textwrap
 from datasets import load_dataset
 from transformers import AutoTokenizer
 from datasketch import MinHash, MinHashLSH, LeanMinHash
@@ -10,6 +11,7 @@ from tqdm import tqdm
 
 from impruver.dataset import ChatDataset
 from impruver.utils import dynamic_import
+from impruver._cli.subcommand import Subcommand
 
 
 def calc_fingerprint(tokens, num_perm=128):
@@ -150,5 +152,29 @@ def compose_dataset(config_path: str, train_path: str = None, val_path: str = No
     split_and_save_records(deduplicated_records, train_path, val_path)
 
 
-if __name__ == "__main__":
-    fire.Fire(compose_dataset)
+class ComposeDataset(Subcommand):
+    def __init__(self, subparsers: argparse._SubParsersAction):
+        super().__init__()
+        self._parser = subparsers.add_parser(
+            "ls",
+            prog="impruver compose_dataset",
+            help="Скачать, преобразовать, дедуплицировать, разделить результат на обучающую и тестовую выборку, "
+                 "после чего сохранить на диск в формате JSONL.",
+            description="Подготовить датасет",
+            epilog=textwrap.dedent(
+                """\
+            Например:
+                $ impruver ls
+                RECIPE                                   CONFIG
+                full_finetune_single_device              llama2/7B_full_single_device
+                full_finetune_distributed                llama2/7B_full
+                                                         llama2/13B_full
+                ...
+    
+            To run one of these recipes:
+                $ impruver run full_finetune_single_device --config llama2/7B_full_single_device
+            """
+            ),
+            formatter_class=argparse.RawTextHelpFormatter,
+        )
+        self._parser.set_defaults(func=self._ls_cmd)

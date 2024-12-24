@@ -42,8 +42,8 @@ GitHub = "https://github.com/EvilFreelancer/impruver"
 Documentation = "https://github.com/EvilFreelancer/impruver/wiki"
 Issues = "https://github.com/EvilFreelancer/impruver/issues"
 
-#[project.scripts]
-#impruver = "impruver.cli:main"
+[project.scripts]
+impruver = "impruver._cli.impruver:main"
 
 [project.optional-dependencies]
 dev = [
