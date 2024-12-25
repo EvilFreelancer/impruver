@@ -28,7 +28,8 @@ Language Models (LLM).
 
 * Python 3.12
 * Python Virtual Environment
-* Nvidia GPU с 24Гб VRAM (на видеокартах с меньшим объёмом VRAM можно уменьшить `train_batch_size`)
+* Nvidia GPU с 24Гб VRAM (на видеокартах с меньшим объёмом VRAM можно уменьшить размер `per_device_*_batch_size`
+  и/или `gradient_accumulation_steps`)
 * Драйвера Nvidia и CUDA
 
 ## Как установить
@@ -58,6 +59,12 @@ impruver ls
 
 Подробнее про [конфигурации](https://github.com/EvilFreelancer/impruver/wiki) в wiki проекта.
 
+Вы можете скопировать конфигурацию локально:
+
+```shell
+impruver cp ruGPT-3.5/13B_lora_saiga2 ./ruGPT-3.5_13B_lora_saiga2.yaml
+```
+
 ## Как пользоваться
 
 Прежде чем приступить к обучению модели необходимо подготовить и дедуплицировать датасет, после чего разделить
@@ -66,13 +73,18 @@ impruver ls
 Все эти задачи можно выполнить запустив рецепт `compose_dataset` и указав необходимую конфигурацию:
 
 ```shell
+impruver run compose_dataset --config ./ruGPT-3.5_13B_lora_saiga2.yaml
+```
+
+```shell
+# Или используя конфигурацию дующую в стандартной поставке
 impruver run compose_dataset --config ruGPT-3.5/13B_lora_saiga2
 ```
 
 Далее запускаем рецепт обучения трансфорфмерной модели:
 
 ```shell
-impruver run finetune --config ruGPT-3.5/13B_lora_saiga2
+impruver run finetune --config ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 Скрипт тренировки поддерживает режим отправки логов в Weights and Biases, но по умолчанию данный функционал отключен,
@@ -81,7 +93,7 @@ impruver run finetune --config ruGPT-3.5/13B_lora_saiga2
 По завершению обучения можно запустить интерактивный чат:
 
 ```shell
-impruver run chat ruGPT-3.5/13B_lora_saiga2
+impruver run chat ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 ## Лицензия

@@ -26,7 +26,8 @@ Language Models (LLM).
 
 * Python 3.12
 * Python Virtual Environment
-* Nvidia GPU с 24Гб VRAM (на видеокартах с меньшим объёмом VRAM можно уменьшить `train_batch_size`)
+* Nvidia GPU с 24Гб VRAM (на видеокартах с меньшим объёмом VRAM можно уменьшить размер `per_device_*_batch_size`
+  и/или `gradient_accumulation_steps`)
 * Драйвера Nvidia и CUDA
 
 ## Доступные конфигурации
