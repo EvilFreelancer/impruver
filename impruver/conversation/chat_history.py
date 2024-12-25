@@ -1,7 +1,5 @@
 from typing import List, Dict
 
-from impruver.data.tokenizer import Tokenizer
-
 
 class ChatHistory:
     def __init__(self, history_limit: int = None, system_prompt: str = None):
@@ -37,21 +35,3 @@ class ChatHistory:
 
     def get_messages(self) -> list:
         return self.messages
-
-
-def get_prompt(tokenizer: Tokenizer, messages: List[Dict], add_generation_prompt: bool = False):
-    return tokenizer.apply_chat_template(
-        messages,
-        add_special_tokens=False,
-        tokenize=False,
-        add_generation_prompt=add_generation_prompt,
-    )
-
-
-def generate(model, tokenizer, prompt, generation_config):
-    data = tokenizer(prompt, return_tensors="pt")
-    data = {k: v.to(model.device) for k, v in data.items()}
-    output_ids = model.generate(**data, generation_config=generation_config)[0]
-    output_ids = output_ids[len(data["input_ids"][0]):]
-    output = tokenizer.decode(output_ids, skip_special_tokens=True)
-    return output.strip()

@@ -18,33 +18,32 @@ ROOT = Path(impruver.__file__).parent.parent
 
 
 class Run(Subcommand):
-    """Holds all the logic for the `tune run` subcommand."""
+    """
+    Содержит в себе всю логику для запуска подкоманд через `impriver run`.
+    """
 
     def __init__(self, subparsers):
         super().__init__()
         self._parser = subparsers.add_parser(
             "run",
-            prog="tune run",
+            prog="impruver run",
             help="Run a recipe. For distributed recipes, this supports all torchrun arguments.",
             description="Run a recipe. For distributed recipes, this supports all torchrun arguments.",
-            usage="tune run [TORCHRUN-OPTIONS] <recipe> --config <config> [RECIPE-OPTIONS]",
+            usage="impruver run [TORCHRUN-OPTIONS] <recipe> --config <config> [RECEIPT-OPTIONS]",
             epilog=textwrap.dedent(
                 """\
                 examples:
 
                     # Run a finetuning recipe on a single device w/ default values
-                    $ tune run lora_finetune_single_device --config llama2/7B_lora_single_device
+                    $ impruver run \
+                        finetune ruGPT-3.5/13B_lora_saiga2
 
-                    # Run a finetuning recipe in a distributed fashion using torchrun w/ default values
-                    $ tune run --nproc_per_node 4 full_finetune_distributed --config llama2/7B_full_finetune_distributed
+                    # Run a finetuning recipe in a distributed fashion using torchrun and specify a number of GPUs for torchrun
+                    $ impruver run \
+                        --nproc_per_node 4 \
+                        finetune ruGPT-3.5/13B_lora_saiga2
 
-                    # Override a parameter in the config file and specify a number of GPUs for torchrun
-                    $ tune run --nproc_per_node 2 \
-                        lora_finetune_single_device \
-                        --config llama2/7B_lora_single_device \
-                        model.lora_rank=16 \
-
-                Remember, you can use `tune cp` to copy a default recipe/config to your local dir and modify the values.
+                Remember, you can use `impruver cp` to copy a default recipe/config to your local dir and modify the values.
                 """
             ),
             formatter_class=argparse.RawTextHelpFormatter,
@@ -53,7 +52,8 @@ class Run(Subcommand):
         self._parser.set_defaults(func=self._run_cmd)
 
     def _add_arguments(self) -> None:
-        """Add arguments to the parser.
+        """
+        Add arguments to the parser.
 
         This is a bit hacky since we need to add the torchrun arguments to our parser.
         This grabs the argparser from torchrun, iterates over it's actions, and adds them
@@ -64,8 +64,8 @@ class Run(Subcommand):
         for action in torchrun_argparser._actions:
             if action.dest == "training_script":
                 action.dest = "recipe"
-                action.help = """Name or path to recipe to be launched followed by args.
-For a list of all possible recipes, run `tune ls`."""
+                action.help = ("Name or path to recipe to be launched followed by args. "
+                               "For a list of all possible recipes, run `impruver ls`.")
             elif action.dest == "training_script_args":
                 action.dest = "recipe_args"
                 action.help = "Args to be passed to the recipe."
@@ -75,8 +75,9 @@ For a list of all possible recipes, run `tune ls`."""
 
     @record
     def _run_distributed(self, args: argparse.Namespace, is_builtin: bool):
-        """Run a recipe with torchrun."""
-        # TODO (rohan-varma): Add check that nproc_per_node <= cuda device count. Currently,
+        """
+        Run a recipe with torchrun.
+        """
         # we don't do this since we test on CPUs for distributed. Will update once multi GPU CI is supported.
         print("Running with torchrun...")
         # Have to reset the argv so that the recipe can be run with the correct arguments

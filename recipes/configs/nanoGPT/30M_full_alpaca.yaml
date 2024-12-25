@@ -55,8 +55,8 @@ trainer:
   per_device_eval_batch_size: 64
   gradient_accumulation_steps: 5
   logging_steps: 1
-  #beta1: 0.9
-  #beta2: 0.99
+  adam_beta1: 0.9
+  adam_beta2: 0.99
   learning_rate: 0.001
   #min_lr: 1e-4
   num_train_epochs: 3

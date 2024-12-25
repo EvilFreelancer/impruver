@@ -11,26 +11,26 @@ ROOT = Path(impruver.__file__).parent.parent
 
 
 class Copy(Subcommand):
-    """Holds all the logic for the `tune cp` subcommand."""
+    """Содержит всю логику для подкоманды `tune cp`."""
 
     def __init__(self, subparsers):
         super().__init__()
         self._parser = subparsers.add_parser(
             "cp",
-            prog="tune cp",
-            usage="tune cp <recipe|config> destination [OPTIONS]",
+            prog="impruver cp",
+            usage="impruver cp <recipe|config> <destination> [OPTIONS]",
             help="Copy a built-in recipe or config to a local path.",
             description="Copy a built-in recipe or config to a local path.",
             epilog=textwrap.dedent(
                 """\
             examples:
-                $ tune cp lora_finetune_distributed .
-                Copied file to ./lora_finetune_distributed.py
+                $ impruver cp finetune .
+                Copied file to ./finetune_transformers.py
 
-                $ tune cp llama2/7B_full ./new_dir/my_custom_lora.yaml --make-parents
-                Copyied file to ./new_dir/my_custom_lora.yaml
+                $ impruver cp ruGPT-3.5/13B_lora_saiga2 ./new_dir/my_custom_lora.yaml --make-parents
+                Copied file to ./new_dir/my_custom_lora.yaml
 
-            Need to see all possible recipes/configs to copy? Try running `tune ls`.
+            Need to see all possible recipes/configs to copy? Try running `impruver ls`.
             """
             ),
             formatter_class=argparse.RawTextHelpFormatter,
@@ -39,34 +39,26 @@ class Copy(Subcommand):
         self._parser.set_defaults(func=self._cp_cmd)
 
     def _add_arguments(self) -> None:
-        """Add arguments to the parser."""
         self._parser.add_argument(
-            "file",
-            type=str,
-            help="Recipe/config to copy. For a list of all possible options, run `tune ls`",
+            "file", type=str,
+            help="Recipe/config to copy. For a list of all possible options, run `impruver ls`",
         )
         self._parser.add_argument(
-            "destination",
-            type=Path,
+            "destination", type=Path,
             help="Location to copy the file to",
         )
         self._parser.add_argument(
-            "-n",
-            "--no-clobber",
-            action="store_true",
+            "-n", "--no-clobber", action="store_true", default=False,
             help="Do not overwrite destination if it already exists",
-            default=False,
+
         )
         self._parser.add_argument(
-            "--make-parents",
-            action="store_true",
+            "--make-parents", action="store_true", default=False,
             help="Create parent directories for destination if they do not exist. "
-            "If not set to True, will error if parent directories do not exist",
-            default=False,
+                 "If not set to True, will error if parent directories do not exist",
         )
 
     def _cp_cmd(self, args: argparse.Namespace):
-        """Copy a recipe or config to a new location."""
         destination: Path = args.destination
         src = None
 
@@ -85,7 +77,7 @@ class Copy(Subcommand):
         # Fail if no file exists
         if src is None:
             self._parser.error(
-                f"Invalid file name: {args.file}. Try `tune ls` to see all available files to copy."
+                f"Invalid file name: {args.file}. Try `impruver ls` to see all available files to copy."
             )
 
         # Attach proper suffix if needed

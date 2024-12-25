@@ -1,9 +1,8 @@
 import yaml
-import fire
 import json
 import random
-import argparse
-import textwrap
+import fire
+
 from datasets import load_dataset
 from transformers import AutoTokenizer
 from datasketch import MinHash, MinHashLSH, LeanMinHash
@@ -11,7 +10,6 @@ from tqdm import tqdm
 
 from impruver.dataset import ChatDataset
 from impruver.utils import dynamic_import
-from impruver._cli.subcommand import Subcommand
 
 
 def calc_fingerprint(tokens, num_perm=128):
@@ -118,9 +116,13 @@ def split_and_save_records(records: list, train_path: str, val_path: str):
             w.write(json.dumps(record, ensure_ascii=False).strip() + "\n")
 
 
-def compose_dataset(config_path: str, train_path: str = None, val_path: str = None):
+def compose_dataset(
+    config: str,
+    train_path: str = None,
+    val_path: str = None
+):
     # Load the config file
-    with open(config_path, "r") as r:
+    with open(config, "r") as r:
         config = yaml.safe_load(r)
 
     # Get paths to train and validation sets
@@ -152,29 +154,5 @@ def compose_dataset(config_path: str, train_path: str = None, val_path: str = No
     split_and_save_records(deduplicated_records, train_path, val_path)
 
 
-class ComposeDataset(Subcommand):
-    def __init__(self, subparsers: argparse._SubParsersAction):
-        super().__init__()
-        self._parser = subparsers.add_parser(
-            "ls",
-            prog="impruver compose_dataset",
-            help="Скачать, преобразовать, дедуплицировать, разделить результат на обучающую и тестовую выборку, "
-                 "после чего сохранить на диск в формате JSONL.",
-            description="Подготовить датасет",
-            epilog=textwrap.dedent(
-                """\
-            Например:
-                $ impruver ls
-                RECIPE                                   CONFIG
-                full_finetune_single_device              llama2/7B_full_single_device
-                full_finetune_distributed                llama2/7B_full
-                                                         llama2/13B_full
-                ...
-    
-            To run one of these recipes:
-                $ impruver run full_finetune_single_device --config llama2/7B_full_single_device
-            """
-            ),
-            formatter_class=argparse.RawTextHelpFormatter,
-        )
-        self._parser.set_defaults(func=self._ls_cmd)
+if __name__ == "__main__":
+    fire.Fire(compose_dataset)

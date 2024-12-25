@@ -1,36 +1,25 @@
 import yaml
 import fire
+
 import torch
 from transformers import logging, GenerationConfig, BitsAndBytesConfig
 
 from impruver.utils import set_seed, get_dtype, dynamic_import
-
-FUNCTION = """
-{
-    "name": "get_news_headlines",
-    "description": "Запросить заголовки новостей на конкретную тематику только если пользователь об этом попросил",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "topic": {
-                "type": "string",
-                "description": "Тематика новостей"
-            }
-        },
-        "required": [ "topic" ]
-    } 
-}
-"""
-DEFAULT_SYSTEM_PROMPT = f"Ты полезный помощник с доступом к следующим функциям. Используй их при необходимости:\n{FUNCTION}"
+from impruver.conversation import get_prompt, generate, ChatHistory
 
 
-
-
-def infer(
-    config_file: str,
-    output_dir: str = None,
-    seed: int = 42,
+def chat(
+    config: str,
+    output_dir: str | None = None,
     history_limit: int = 10,
+    system_prompt: str | None = None,
+    seed: int = 42,
+    max_new_tokens: int = 200,
+    repetition_penalty: float = 1.2,
+    do_sample: bool = True,
+    temperature: float = 0.5,
+    top_p: float = 0.6,
+    top_k: int = 40,
 ):
     set_seed(seed)
     logging.set_verbosity_info()
@@ -40,10 +29,11 @@ def infer(
     #
 
     # Read config from disk
-    with open(config_file, "r") as r:
+    with open(config, "r") as r:
         config = yaml.safe_load(r)
 
     # Path where model will be saved
+    output_dir = output_dir
     if output_dir is None:
         output_dir = config['output_dir']
 
@@ -105,9 +95,12 @@ def infer(
 
     # Generator config
     generation_config = GenerationConfig.from_pretrained(output_dir)
-    generation_config.max_new_tokens = 200
-    generation_config.repetition_penalty = 1.2
-    generation_config.do_sample = True
+    generation_config.max_new_tokens = max_new_tokens
+    generation_config.repetition_penalty = repetition_penalty
+    generation_config.do_sample = do_sample
+    generation_config.temperature = temperature
+    generation_config.top_p = top_p
+    generation_config.top_k = top_k
 
     # Attention implementation
     attn_implementation = None
@@ -141,13 +134,13 @@ def infer(
     #
 
     # Start chat loop
-    chat_history = ChatHistory(history_limit=history_limit)
+    chat_history = ChatHistory(history_limit, system_prompt)
     while True:
         user_message = input("User: ")
 
         # Reset chat command
         if user_message.strip() == "/reset":
-            chat_history = ChatHistory(history_limit=history_limit)
+            chat_history = ChatHistory(history_limit, system_prompt)
             print("History reset completed!")
             continue
 
@@ -160,21 +153,14 @@ def infer(
 
         # Get list of messages
         prompt = get_prompt(tokenizer, chat_history.get_messages(), True)
-        # print("==============================")
-        # print(prompt)
-        # print("==============================")
-        output = generate(
-            model=model,
-            tokenizer=tokenizer,
-            prompt=prompt,
-            generation_config=generation_config
-        )
+
+        # Generate response
+        output = generate(model, tokenizer, prompt, generation_config)
+
+        # Save response to chat history as assistant's message
         chat_history.add_assistant_message(output)
-        print("Bot:", output)
-        # print()
-        # print("==============================")
-        # print()
+        print("Assistant:", output)
 
 
 if __name__ == "__main__":
-    fire.Fire(infer)
+    fire.Fire(chat)

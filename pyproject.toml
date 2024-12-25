@@ -43,7 +43,7 @@ Documentation = "https://github.com/EvilFreelancer/impruver/wiki"
 Issues = "https://github.com/EvilFreelancer/impruver/issues"
 
 [project.scripts]
-impruver = "impruver._cli.impruver:main"
+impruver = "impruver._cli._parser:main"
 
 [project.optional-dependencies]
 dev = [

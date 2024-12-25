@@ -6,16 +6,15 @@ import json
 
 import wandb
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorForTokenClassification
-from transformers import Trainer, TrainingArguments, logging, BitsAndBytesConfig
+from transformers import Trainer, TrainingArguments, logging, BitsAndBytesConfig, DataCollatorForTokenClassification
 from peft import get_peft_model, LoraConfig
 
 from impruver.utils import set_seed, read_jsonl, get_dtype, dynamic_import
 from impruver.data import DEFAULT_CHAT_TEMPLATE
 
 
-def train(
-    config_file: str,
+def finetune(
+    config: str,
     train_path: str = None,
     val_path: str = None,
     output_dir: str = None,
@@ -29,8 +28,15 @@ def train(
     # Load configuration
     #
 
+    if os.path.exists(config):
+        config_path = config
+    else:
+        import recipes
+        recipies_path = os.path.join(recipes.__path__[0])
+        config_path = recipies_path + '/configs/' + config + '.yaml'
+
     # Read config from disk
-    with open(config_file, "r") as r:
+    with open(config_path, "r") as r:
         config = yaml.safe_load(r)
 
     # Get paths to train and validation sets
@@ -191,7 +197,7 @@ def train(
     training_args = TrainingArguments(
         output_dir=output_dir,
         report_to=report_to,
-        run_name=config_file,
+        run_name=config,
         **training_args_dict
     )
 
@@ -218,4 +224,4 @@ def train(
 
 
 if __name__ == "__main__":
-    fire.Fire(train)
+    fire.Fire(finetune)
