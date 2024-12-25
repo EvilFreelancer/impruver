@@ -1,7 +1,7 @@
 import yaml
-import fire
 import json
 import random
+import fire
 
 from datasets import load_dataset
 from transformers import AutoTokenizer
@@ -116,9 +116,13 @@ def split_and_save_records(records: list, train_path: str, val_path: str):
             w.write(json.dumps(record, ensure_ascii=False).strip() + "\n")
 
 
-def compose_dataset(config_path: str, train_path: str = None, val_path: str = None):
+def compose_dataset(
+    config: str,
+    train_path: str = None,
+    val_path: str = None
+):
     # Load the config file
-    with open(config_path, "r") as r:
+    with open(config, "r") as r:
         config = yaml.safe_load(r)
 
     # Get paths to train and validation sets

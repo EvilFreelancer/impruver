@@ -7,7 +7,7 @@ authors = [
 keywords = ["pytorch", "finetuning", "llm"]
 license = { file = "LICENSE" }
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     # Core
     "pydantic>=2.10.4",
@@ -15,35 +15,36 @@ dependencies = [
     "jsonlines>=4.0.0",
     "fire>=0.7.0",
     "datasketch>=1.6.5",
-
-    # Hugging Face integrations
     "torch>=2.5.1",
+    # Hugging Face integrations
     "datasets>=3.2.0",
     "transformers>=4.47.1",
     "huggingface-hub>=0.27.0",
     "safetensors>=0.4.5",
     "zstandard>=0.23.0",
-
-    # Tokenization
     "tokenizers>=0.21.0",
-
     # Miscellaneous
     "tqdm>=4.67.1",
-
     # Quantization
     "bitsandbytes>=0.45.0",
     "peft>=0.14.0",
+    # DDP
     "accelerate>=1.2.1"
 ]
 dynamic = ["version"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 
 [project.urls]
 GitHub = "https://github.com/EvilFreelancer/impruver"
 Documentation = "https://github.com/EvilFreelancer/impruver/wiki"
 Issues = "https://github.com/EvilFreelancer/impruver/issues"
 
-#[project.scripts]
-#impruver = "impruver.cli:main"
+[project.scripts]
+impruver = "impruver._cli._parser:main"
 
 [project.optional-dependencies]
 dev = [

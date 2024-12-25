@@ -4,16 +4,15 @@ pyyaml>=6.0.2
 jsonlines>=4.0.0
 fire>=0.7.0
 datasketch>=1.6.5
+torch>=2.5.1
+accelerate>=1.2.1
 
 # Hugging Face integrations
-torch>=2.5.1
 datasets>=3.2.0
 transformers>=4.47.1
 huggingface-hub>=0.27.0
 safetensors>=0.4.5
 zstandard>=0.23.0
-
-# Tokenization
 tokenizers>=0.21.0
 
 # Miscellaneous
@@ -22,7 +21,6 @@ tqdm>=4.67.1
 # Quantization
 bitsandbytes>=0.45.0
 peft>=0.14.0
-accelerate>=1.2.1
 
 # Other
 wandb>=0.19.1

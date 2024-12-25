@@ -3,5 +3,9 @@
 /venv/
 /impruver.egg-info/
 /build/
+/dist/
 /*.yaml
 __pycache__
+/output/
+/*.jsonl
+/wandb/

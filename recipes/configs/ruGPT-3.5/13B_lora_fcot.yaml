@@ -1,9 +1,9 @@
 # Training time
 # - 1x RTX 4090 ~ 21.9GiB
 
-output_dir: ./models/ruGPT35_13B_lora_fcot
-train_path: ./train.ruGPT35_13B_fcot.jsonl
-val_path: ./val.ruGPT35_13B_fcot.jsonl
+output_dir: ./models/ruGPT-3.5_13B_lora_fcot
+train_path: ./train.ruGPT-3.5_13B_fcot.jsonl
+val_path: ./val.ruGPT-3.5_13B_fcot.jsonl
 
 datasets:
   - name: korotkov/glaive-function-calling-v2-ru-parsed
