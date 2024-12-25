@@ -57,13 +57,13 @@ pip install impruver
 impruver ls
 ```
 
-Подробнее про [конфигурации](https://github.com/EvilFreelancer/impruver/wiki) в wiki проекта.
-
 Вы можете скопировать конфигурацию локально:
 
 ```shell
 impruver cp ruGPT-3.5/13B_lora_saiga2 ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
+
+Подробнее про [конфигурации](https://github.com/EvilFreelancer/impruver/wiki) в wiki проекта.
 
 ## Как пользоваться
 
