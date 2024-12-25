@@ -63,22 +63,28 @@ impruver ls
 Все эти задачи можно выполнить запустив рецепт `compose_dataset` и указав необходимую конфигурацию:
 
 ```shell
+impruver run compose_dataset --config ./ruGPT-3.5_13B_lora_saiga2.yaml
+```
+
+Или используя конфигурацию, идущую в стандартной поставке:
+
+```shell
 impruver run compose_dataset --config ruGPT-3.5/13B_lora_saiga2
 ```
 
-Далее запускаем рецепт обучения трансфорфмерной модели:
+Далее запускаем рецепт `finetune` для обучения трансфорфмерной модели:
 
 ```shell
-impruver run finetune --config ruGPT-3.5/13B_lora_saiga2
+impruver run finetune --config ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 Скрипт тренировки поддерживает режим отправки логов в Weights and Biases, но по умолчанию данный функционал отключен,
 для того чтобы включить данный функционал нужно добавить опцию `--report-to=wandb` в команду запуска обучения.
 
-По завершению обучения можно запустить интерактивный чат:
+По завершению обучения при помощи рецепта `chat` можно запустить интерактивный чат:
 
 ```shell
-impruver run chat ruGPT-3.5/13B_lora_saiga2
+impruver run chat ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 ## Режим (D)DP - (Distributed) Data Parallel
