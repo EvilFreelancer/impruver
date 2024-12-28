@@ -14,6 +14,7 @@ def instruction_to_messages(sample: dict, skip_labels: list = ["bad_output"], ma
     instruction_key = mapping.get("instruction", "instruction") if mapping else "instruction"
     input_key = mapping.get("input", "input") if mapping else "input"
     output_key = mapping.get("output", "output") if mapping else "output"
+    system_key = mapping.get("system", None) if mapping else None
 
     if "label" in sample and sample.get(input_key) in skip_labels:
         return None
@@ -22,7 +23,12 @@ def instruction_to_messages(sample: dict, skip_labels: list = ["bad_output"], ma
     if input_key in sample and sample[input_key]:
         instruction += "\n" + sample[input_key]
 
-    return [
+    messages = [
         {"role": "user", "content": instruction},
         {"role": "assistant", "content": sample.get(output_key, "")}
     ]
+
+    if system_key and system_key in sample:
+        messages.insert(0, {"role": "system", "content": sample.get(system_key, "")})
+
+    return messages

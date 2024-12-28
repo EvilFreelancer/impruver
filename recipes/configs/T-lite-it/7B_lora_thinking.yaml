@@ -1,0 +1,54 @@
+output_dir: ./models/T-lite-it_7B_lora_thinking
+train_path: ./train.T-lite-it_7B_lora_thinking.jsonl
+val_path: ./val.T-lite-it_7B_lora_thinking.jsonl
+
+datasets:
+  - name: Egor-AI/Russian_thinking_dataset
+    converter: impruver.instruction_to_messages
+    mapping:
+      system: system
+      instruction: prompt
+      output: response
+
+model:
+  class: transformers.AutoModelForCausalLM
+  name: t-tech/T-lite-it-1.0
+  load_in_4bit: true
+  load_in_8bit: false
+  dtype: bf16
+
+lora:
+  r: 8
+  lora_alpha: 32
+  lora_dropout: 0.1
+  bias: none
+  target_modules: [ "q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj" ]
+  task_type: CAUSAL_LM
+
+tokenizer:
+  class: transformers.AutoTokenizer
+  name: t-tech/T-lite-it-1.0
+  #max_tokens_count: 1200
+
+trainer:
+  eval_strategy: steps
+  save_strategy: steps
+  eval_steps: 500
+  save_steps: 500
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 4
+  logging_steps: 10
+  learning_rate: 0.0004
+  num_train_epochs: 3
+  lr_scheduler_type: cosine
+  warmup_steps: 16
+  optim: adamw_8bit
+  metric_for_best_model: eval_loss
+  load_best_model_at_end: true
+  save_total_limit: 2
+  seed: 42
+  remove_unused_columns: false
+  max_grad_norm: 1.0
+  weight_decay: 0.08
+  torch_compile: false
