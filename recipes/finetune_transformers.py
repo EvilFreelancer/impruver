@@ -191,7 +191,7 @@ def finetune(
     # If reporting to W&B is enabled
     if trainer_config.get("report_to", None) == "wandb":
         os.environ["WANDB_MODE"] = "online"
-        wandb.init(project="impruver", config=config)
+        wandb.init(project="impruver", name=str(config_path), config=config)
 
     # Prepare trainer configuration
     training_args = TrainingArguments(
