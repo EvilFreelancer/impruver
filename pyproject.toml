@@ -4,7 +4,7 @@ description = "Transformer based LLM trainer"
 authors = [
     { name = "Pavel Rykov", email = "paul@drteam.rocks" },
 ]
-keywords = ["pytorch", "finetuning", "llm"]
+keywords = ["pytorch", "transformers", "finetuning", "llm"]
 license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.12"
@@ -50,6 +50,7 @@ impruver = "impruver._cli._parser:main"
 dev = [
     "wandb>=0.19.1",
     "tiktoken>=0.8.0",
+    "torchao>=0.4.0", # required for "adamw_torch_4bit" optimizer
 ]
 
 [tool.setuptools.dynamic]
