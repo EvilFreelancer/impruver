@@ -5,6 +5,8 @@ val_path: ./val.T-lite-it_7B_lora_thinking.jsonl
 datasets:
   - name: Egor-AI/Russian_thinking_dataset
     converter: impruver.instruction_to_messages
+    add_global_bos: false
+    add_global_eos: false
     mapping:
       system: system
       instruction: prompt
