@@ -42,11 +42,10 @@ pip install impruver
 
 После чего в PATH станет доступна утилита командной строки `impruver`.
 
-Если же планируется обучение моделей поддерживающих Flash Attention, то устанавливать следует так:
+Если же планируется обучение моделей с использованием Flash Attention, то надо будет выполнить ещё и:
 
 ```shell
 pip install setuptools psutil torch flash-attn --no-build-isolation
-pip install impruver
 ```
 
 ## Доступные конфигурации
