@@ -197,7 +197,7 @@ def finetune(
     training_args = TrainingArguments(
         output_dir=output_dir,
         report_to=report_to,
-        run_name=config,
+        run_name=str(config_path),
         **training_args_dict
     )
 
