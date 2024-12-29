@@ -127,7 +127,7 @@ ddp:
 После этого можно будет запустить обучение:
 
 ```shell
-accelerate launch train_transformers.py configs/ruGPT-3.5/13B_lora_saiga2.yaml
+accelerate launch impruver run finetune --config ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 Опция `--report-to=wandb` в таком формате тоже поддерживается.
