@@ -1,5 +1,5 @@
 # Training time
-# - 1x RTX 4090 ~ 23Gb VRAM ~ 11m 10m
+# - 1x RTX 4090 ~ 23Gb VRAM ~ 20h 30m
 
 output_dir: ./models/T-lite-it_7B_lora_thinking
 train_path: ./train.T-lite-it_7B_lora_thinking.jsonl
