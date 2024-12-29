@@ -20,6 +20,7 @@ model:
     n_head: 6
     n_inner: null
     n_embd: 384
+    n_ctx: 256
     _attn_implementation: eager
     max_position_embeddings: 256
     attn_pdrop: 0.2
