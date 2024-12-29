@@ -48,7 +48,7 @@ def get_all_recipes(config_dir: str = ROOT / "recipes") -> List[Recipe]:
                 continue
             all_configs.append(config_obj)
     # Сортируем все конфигурации в алфавитном порядке по атрибуту file_path
-    all_configs.sort(key=lambda x: x.file_path)
+    all_configs.sort(key=lambda x: x.file_path.lower())
 
     recipe_compose_dataset = Recipe(
         name="compose_dataset",
