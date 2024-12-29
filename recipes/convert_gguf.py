@@ -71,13 +71,18 @@ def convert_gguf(
     convert_script = os.path.join(llama_cpp_dir, "convert_hf_to_gguf.py")
 
     print("Converting model to GGUF (FP16)...")
-    convert_cmd = [
-        "python", convert_script,
-        "--outtype", "f16",
-        "--outfile", gguf_model_path,
-        processing_dir
-    ]
+    convert_cmd = ["python", convert_script, "--outtype", "f16", "--outfile", gguf_model_path, processing_dir]
     subprocess.run(convert_cmd, check=True)
+
+    # Create the Modelfile.f16
+    q_level = "f16"
+    header_file_name = f"Modelfile.{q_level}"
+    header_file_path = os.path.join(gguf_dir, header_file_name)
+    with open(header_file_path, "w", encoding="utf-8") as hf:
+        hf.write(f"FROM model-{q_level}.gguf\n")
+        hf.write("PARAMETER temperature 1\n")
+        hf.write("# PARAMETER num_ctx 4096\n")
+        hf.write("# SYSTEM You are Mario from super mario bros, acting as an assistant.\n")
 
     #
     # Quantization step
@@ -90,7 +95,7 @@ def convert_gguf(
         quant_cmd = [llama_cpp_quantize_bin, gguf_model_path, quant_out_path, q_level]
         subprocess.run(quant_cmd, check=True)
 
-        # Create the Modelfile.qX_Y with the small header
+        # Create the Modelfile.qX_Y
         header_file_name = f"Modelfile.{q_level}"
         header_file_path = os.path.join(gguf_dir, header_file_name)
         with open(header_file_path, "w", encoding="utf-8") as hf:
