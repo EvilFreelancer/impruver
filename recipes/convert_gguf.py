@@ -83,12 +83,21 @@ def convert_gguf(
     # Quantization step
     #
 
-    # quant_list = [q for q in quantizations]
-    # for q_level in quant_list:
-    #     print(f"Quantizing to {q_level}...")
-    #     quant_out_path = os.path.join(output_dir, f"model-{q_level}.gguf")
-    #     quant_cmd = [llama_cpp_quantize_bin, gguf_model_path, quant_out_path, q_level]
-    #     subprocess.run(quant_cmd, check=True)
+    quant_list = [q for q in quantizations]
+    for q_level in quant_list:
+        print(f"Quantizing to {q_level}...")
+        quant_out_path = os.path.join(output_dir, f"model-{q_level}.gguf")
+        quant_cmd = [llama_cpp_quantize_bin, gguf_model_path, quant_out_path, q_level]
+        subprocess.run(quant_cmd, check=True)
+
+        # Create the Modelfile.qX_Y with the small header
+        header_file_name = f"Modelfile.{q_level}"
+        header_file_path = os.path.join(gguf_dir, header_file_name)
+        with open(header_file_path, "w", encoding="utf-8") as hf:
+            hf.write(f"FROM model-{q_level}.gguf\n")
+            hf.write("PARAMETER temperature 1\n")
+            hf.write("# PARAMETER num_ctx 4096\n")
+            hf.write("# SYSTEM You are Mario from super mario bros, acting as an assistant.\n")
 
 
 if __name__ == "__main__":
