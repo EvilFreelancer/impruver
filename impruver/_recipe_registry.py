@@ -68,8 +68,14 @@ def get_all_recipes(config_dir: str = ROOT / "recipes") -> List[Recipe]:
         configs=all_configs,
         supports_distributed=False,
     )
+    recipe_convert_gguf = Recipe(
+        name="convert_gguf",
+        file_path="convert_gguf.py",
+        configs=[],
+        supports_distributed=False,
+    )
 
-    return [recipe_finetune, recipe_compose_dataset, recipe_chat]
+    return [recipe_compose_dataset, recipe_finetune, recipe_chat, recipe_convert_gguf]
 
 
 if __name__ == "__main__":

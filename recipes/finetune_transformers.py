@@ -32,10 +32,10 @@ def finetune(
         config_path = config
     else:
         import recipes
-        recipies_path = os.path.join(recipes.__path__[0])
-        config_path = recipies_path + '/configs/' + config + '.yaml'
+        recipes_path = os.path.join(recipes.__path__[0])
+        config_path = recipes_path + '/configs/' + config + '.yaml'
 
-    # Read config from disk
+    # Read config
     with open(config_path, "r") as r:
         config = yaml.safe_load(r)
 
@@ -53,7 +53,7 @@ def finetune(
     trainer_config = config.get("trainer", {})
 
     # Get settings of Peft/LoRA adapter
-    lora_config = config.get("lora")
+    lora_config = config.get("lora", None)
 
     # Class to work with Tokenizer
     model_class = "transformers.AutoModelForCausalLM"

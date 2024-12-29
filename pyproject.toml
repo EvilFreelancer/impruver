@@ -51,6 +51,7 @@ dev = [
     "wandb>=0.19.1",
     "tiktoken>=0.8.0",
     "torchao>=0.4.0", # required for "adamw_torch_4bit" optimizer
+    "sentencepiece>=0.2.0", # for converting to GGUF
 ]
 
 [tool.setuptools.dynamic]
