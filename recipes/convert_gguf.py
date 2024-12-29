@@ -13,7 +13,7 @@ def convert_gguf(
     config: str,
     llama_cpp_dir: str = "../llama.cpp",
     llama_cpp_quantize_bin: str = "../llama.cpp/llama-quantize",
-    quantizations: List[Dict] = ["q8_0", "q4_0", "q2_k"],
+    quantizations: List[Dict] = ["q8_0", "q5_0", "q4_0", "q2_k"],
     seed: int = 42,
 ):
     set_seed(seed)
@@ -86,7 +86,7 @@ def convert_gguf(
     quant_list = [q for q in quantizations]
     for q_level in quant_list:
         print(f"Quantizing to {q_level}...")
-        quant_out_path = os.path.join(output_dir, f"model-{q_level}.gguf")
+        quant_out_path = os.path.join(gguf_dir, f"model-{q_level}.gguf")
         quant_cmd = [llama_cpp_quantize_bin, gguf_model_path, quant_out_path, q_level]
         subprocess.run(quant_cmd, check=True)
 
