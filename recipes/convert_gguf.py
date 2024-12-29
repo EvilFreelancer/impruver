@@ -12,7 +12,7 @@ from impruver.utils import set_seed, get_dtype, dynamic_import
 def convert_gguf(
     config: str,
     llama_cpp_dir: str = "../llama.cpp",
-    llama_cpp_quantize_bin: str = "../llama.cpp/build/bin/llama-quantize",
+    llama_cpp_quantize_bin: str = "../llama.cpp/llama-quantize",
     quantizations: List[Dict] = ["q8_0", "q4_0", "q2_k"],
     seed: int = 42,
 ):
