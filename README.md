@@ -87,7 +87,7 @@ impruver run compose_dataset --config ruGPT-3.5/13B_lora_saiga2
 impruver run finetune --config ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
-Скрипт тренировки поддерживает режим отправки логов в Weights and Biases, но по умолчанию данный функционал отключен,
+Скрипт тренировки поддерживает режим отправки логов в Weights and Biases, но по умолчанию это отключено,
 для того чтобы включить данный функционал нужно добавить опцию `--report-to=wandb` в команду запуска обучения.
 
 По завершению обучения при помощи рецепта `chat` можно запустить интерактивный чат:
@@ -95,6 +95,8 @@ impruver run finetune --config ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```shell
 impruver run chat ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
+
+Для того чтобы выйти из оболочки чата, используйте комбинацию клавиш `Ctrl+D` или `Ctrl+C`.
 
 ## Лицензия
 
