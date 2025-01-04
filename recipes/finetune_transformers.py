@@ -21,6 +21,18 @@ def finetune(
     report_to: str = "none",
     seed: int = 42,
 ):
+    """
+    Finetune a model using classes from `transformers` package on a given configuration.
+
+    Args:
+        config (str): Path to the configuration file
+        train_path (str): Path to the training set
+        val_path (str): Path to the validation set
+        output_dir (str): Path where the model will be saved
+        report_to (str): Where to report the results
+        seed (int): Random(?) seed
+    """
+
     set_seed(seed)
     logging.set_verbosity_info()
 
@@ -136,6 +148,11 @@ def finetune(
             load_in_8bit=True,
             llm_int8_threshold=6.0,
         )
+    # If ddp enabled and bnb enabled too then use PartialState
+    device_map = None
+    if load_in_4bit or load_in_8bit:
+        from accelerate import PartialState
+        device_map = {"": PartialState().process_index}
 
     # Attention implementation
     attn_implementation = None
@@ -150,7 +167,8 @@ def finetune(
         model = model_obj.from_pretrained(
             config["model"]["name"],
             quantization_config=quantization_config,
-            device_map=None if ddp_config else "auto",  # need to be disabled for DDP
+            # For DDP without bnb should be None, with bnb need to use PartialState index
+            device_map=device_map if ddp_config else "auto",
             torch_dtype=dtype,
             attn_implementation=attn_implementation
         )
