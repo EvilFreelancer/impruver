@@ -5,6 +5,10 @@ val_path: ./val.rugpt3small_toxicator.jsonl
 datasets:
   - name: evilfreelancer/toxicator-ru
     converter: impruver.instruction_to_messages
+    mapping:
+      system: instruction
+      input: input
+      output: output
 
 model:
   class: transformers.AutoModelForCausalLM
