@@ -6,7 +6,7 @@ datasets:
   - name: evilfreelancer/toxicator-ru
     converter: impruver.instruction_to_messages
     mapping:
-      instruction: none
+      instruction: _
       system: instruction
       input: input
       output: output
