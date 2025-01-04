@@ -121,6 +121,15 @@ def compose_dataset(
     train_path: str = None,
     val_path: str = None
 ):
+    """
+    Compose a dataset from multiple datasets specified in the config file.
+
+    Args:
+        config (str): Path to the config file
+        train_path (str): Path to the train set
+        val_path (str): Path to the validation set
+    """
+
     # Load the config file
     with open(config, "r") as r:
         config = yaml.safe_load(r)

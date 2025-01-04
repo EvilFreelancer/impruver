@@ -6,17 +6,26 @@ import fire
 import yaml
 from peft import AutoPeftModelForCausalLM
 
-from impruver.utils import set_seed, get_dtype, dynamic_import
+from impruver.utils import dynamic_import
 
 
 def convert_gguf(
     config: str,
     llama_cpp_dir: str = "../llama.cpp",
     llama_cpp_quantize_bin: str = "../llama.cpp/llama-quantize",
-    quantizations: List[Dict] = ["q8_0", "q5_0", "q4_0", "q2_k"],
-    seed: int = 42,
+    quantizations: List[str] = ["q8_0", "q5_0", "q4_0", "q2_k"],
 ):
-    set_seed(seed)
+    """
+    Convert a PyTorch model to a GGUF format, if provider mode is LoRA adapter,
+    then merge if first, then convert. After that, quantize the model to list of required levels
+    and save nearby a Modelfiles with configuration for importing models to Ollama.
+
+    Args:
+        config (str): Path to the configuration file
+        llama_cpp_dir (str): Path to the llama.cpp directory
+        llama_cpp_quantize_bin (str): Path to the llama-quantize binary
+        quantizations (List[str]): List of quantizations to use
+    """
 
     #
     # Load configuration
@@ -82,10 +91,10 @@ def convert_gguf(
         hf.write(f"FROM model-{q_level}.gguf\n")
         hf.write("PARAMETER temperature 1\n")
         hf.write("# PARAMETER num_ctx 4096\n")
-        hf.write("# SYSTEM You are Mario from super mario bros, acting as an assistant.\n")
+        hf.write("# SYSTEM You are Super King, acting as a king.\n")
 
     #
-    # Quantization step
+    # Quantization loop
     #
 
     quant_list = [q for q in quantizations]
@@ -102,7 +111,7 @@ def convert_gguf(
             hf.write(f"FROM model-{q_level}.gguf\n")
             hf.write("PARAMETER temperature 1\n")
             hf.write("# PARAMETER num_ctx 4096\n")
-            hf.write("# SYSTEM You are Mario from super mario bros, acting as an assistant.\n")
+            hf.write("# SYSTEM You are Super King, acting as a king.\n")
 
 
 if __name__ == "__main__":

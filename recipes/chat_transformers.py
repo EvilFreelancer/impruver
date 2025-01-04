@@ -21,6 +21,23 @@ def chat(
     top_p: float = 0.6,
     top_k: int = 40,
 ):
+    """
+    Chat with a trained model.
+
+    Args:
+        config: Path to config file
+        output_dir: Path to output directory
+        history_limit: Number of previous messages to keep in memory
+        system_prompt: Prompt to use for the system
+        seed: Seed for random number generator
+        max_new_tokens: Maximum number of new tokens to generate
+        repetition_penalty: Penalty for repeated tokens
+        do_sample: Whether to use sampling or greedy decoding
+        temperature: Temperature for sampling
+        top_p: Top-p for sampling
+        top_k: Top-k for sampling
+    """
+
     set_seed(seed)
     logging.set_verbosity_info()
 
