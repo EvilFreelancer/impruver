@@ -63,7 +63,7 @@ impruver ls
 impruver cp ruGPT-3.5/13B_lora_saiga2 ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
-Подробнее про [конфигурации](https://github.com/EvilFreelancer/impruver/wiki) в wiki проекта.
+Подробнее про [конфигурации](https://github.com/EvilFreelancer/impruver/wiki/Конфигурация) в wiki проекта.
 
 ## Как пользоваться
 
@@ -98,6 +98,8 @@ impruver run chat ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 Для того чтобы выйти из оболочки чата, используйте комбинацию клавиш `Ctrl+D` или `Ctrl+C`.
+
+Подробнее про [обучение](https://github.com/EvilFreelancer/impruver/wiki/Обучение) в wiki проекта.
 
 ## Лицензия
 

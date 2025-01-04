@@ -57,7 +57,7 @@ impruver ls
 ```shell
 impruver cp ruGPT-3.5/13B_lora_saiga2 ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
-更多关于[配置](https://github.com/EvilFreelancer/impruver/wiki)的信息，请参阅项目Wiki。
+更多关于[配置](https://github.com/EvilFreelancer/impruver/wiki/Конфигурация)的信息，请参阅项目Wiki。
 
 ## 使用说明
 
@@ -90,6 +90,8 @@ impruver run chat ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 要退出聊天界面，请使用`Ctrl+D`或`Ctrl+C`快捷键。
+
+更多关于[训练](https://github.com/EvilFreelancer/impruver/wiki/Обучение)的信息，请参阅项目Wiki。
 
 ## 许可证
 

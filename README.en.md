@@ -61,7 +61,7 @@ You can copy a configuration locally:
 impruver cp ruGPT-3.5/13B_lora_saiga2 ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
-Learn more about [configurations](https://github.com/EvilFreelancer/impruver/wiki) in the project wiki.
+Learn more about [configurations](https://github.com/EvilFreelancer/impruver/wiki/Конфигурация) in the project wiki.
 
 ## Usage
 
@@ -95,6 +95,8 @@ impruver run chat ./ruGPT-3.5_13B_lora_saiga2.yaml
 ```
 
 To exit the chat shell, use the `Ctrl+D` or `Ctrl+C` keyboard shortcuts.
+
+Learn more about [training](https://github.com/EvilFreelancer/impruver/wiki/Обучение) in the project wiki.
 
 ## License
 
