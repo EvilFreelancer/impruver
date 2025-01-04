@@ -225,13 +225,14 @@ def finetune(
     training_args_dict.update({"label_names": ["labels"]})
 
     # If reporting to W&B is enabled
-    if trainer_config.get("report_to", None) == "wandb":
+    if report_to == "wandb":
         os.environ["WANDB_MODE"] = "online"
         wandb.init(project="impruver", name=str(config_path), config=config)
 
     # Prepare trainer configuration
     training_args = UnslothTrainingArguments(
         **trainer_config,
+        report_to=[report_to],
         output_dir=output_dir
     )
 
