@@ -62,11 +62,11 @@ def get_all_recipes(config_dir: str = ROOT / "recipes") -> List[Recipe]:
         configs=[],
         supports_distributed=False,
     )
-    recipe_finetune = Recipe(
+    recipe_finetune_transformers = Recipe(
         name="finetune",
         file_path="finetune_transformers.py",
         configs=all_configs,
-        supports_distributed=False,
+        supports_distributed=True,
     )
     recipe_convert_gguf = Recipe(
         name="convert_gguf",
@@ -74,8 +74,20 @@ def get_all_recipes(config_dir: str = ROOT / "recipes") -> List[Recipe]:
         configs=[],
         supports_distributed=False,
     )
+    recipe_finetune_unsloth = Recipe(
+        name="unsloth",
+        file_path="finetune_unsloth.py",
+        configs=[],
+        supports_distributed=True,
+    )
 
-    return [recipe_compose_dataset, recipe_finetune, recipe_chat, recipe_convert_gguf]
+    return [
+        recipe_finetune_transformers,
+        recipe_finetune_unsloth,
+        recipe_compose_dataset,
+        recipe_chat,
+        recipe_convert_gguf
+    ]
 
 
 if __name__ == "__main__":
