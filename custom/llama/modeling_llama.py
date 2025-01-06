@@ -49,7 +49,7 @@ from transformers.utils import (
 )
 from transformers.models.llama.configuration_llama import LlamaConfig
 
-from bitnet_llama.module import BitLinearOptimized as BitLinear
+from .module import BitLinearOptimized as BitLinear
 
 
 if is_flash_attn_2_available():
