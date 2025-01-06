@@ -1,4 +1,4 @@
-Прототип модели использующих 1.5bit линейные слои из
+Прототип модели использующей 1.5bit линейные слои из
 проекта [BitNet-Transformers](https://github.com/Beomi/BitNet-Transformers) для
 обучения LLM с архитектурой Llama.
 
