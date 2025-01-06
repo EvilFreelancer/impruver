@@ -1,5 +1,5 @@
 # Training time
-# - 1x RTX 4090 ~ 18.1Gb VRAM ~ 1h 11m
+# - 1x RTX 4090 ~ 23Gb VRAM
 
 output_dir: ./models/BitNet-llama_full_alpaca
 train_path: ./train.BitNet-llama_alpaca.jsonl
@@ -57,9 +57,9 @@ trainer:
   save_strategy: steps
   eval_steps: 1000
   save_steps: 1000
-  per_device_train_batch_size: 1
-  per_device_eval_batch_size: 1
-  gradient_accumulation_steps: 2
+  per_device_train_batch_size: 8
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 5
   logging_steps: 1
   adam_beta1: 0.9
   adam_beta2: 0.99
