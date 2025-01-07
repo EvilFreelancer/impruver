@@ -1,5 +1,8 @@
 # Training time
-# - 1x RTX 4090 ~ 23Gb VRAM
+# custom.llama.LlamaForCausalLM + custom.llama.LlamaConfig:
+# - 1x RTX 4090 ~ 23Gb VRAM ~ 33m
+# transformers.LlamaForCausalLM + transformers.LlamaConfig:
+# - 1x RTX 4090 ~ 15.5Gb VRAM ~ 29m
 
 output_dir: ./models/BitNet-llama_full_alpaca
 train_path: ./train.BitNet-llama_alpaca.jsonl
