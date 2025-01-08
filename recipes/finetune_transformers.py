@@ -107,7 +107,7 @@ def finetune(
 
     # Init tokenizer object
     tokenizer_obj = dynamic_import(tokenizer_class)
-    tokenizer = tokenizer_obj.from_pretrained(tokenizer_name)
+    tokenizer = tokenizer_obj.from_pretrained(tokenizer_name, trust_remote_code=True)
 
     # Check if `chat_template` attribute exists in tokenizer
     if not hasattr(tokenizer, 'chat_template') or tokenizer.chat_template is None:
@@ -180,7 +180,8 @@ def finetune(
             # For DDP without bnb should be None, with bnb need to use PartialState index
             device_map=device_map if ddp_config else "auto",
             torch_dtype=dtype,
-            attn_implementation=attn_implementation
+            attn_implementation=attn_implementation,
+            trust_remote_code=True,
         )
     else:
         # Init from scratch

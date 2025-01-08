@@ -35,6 +35,14 @@ tokenizer:
   class: transformers.AutoTokenizer
   name: ai-sage/GigaChat-20B-A3B-instruct
   max_tokens_count: 1500
+  special_tokens:
+    pad_token_id: 1
+    pad_token: <s>
+    bos_token_id: 1
+    bos_token: <s>
+    eos_token_id: 128001
+    eos_token: <|message_sep|>
+
   chat_template: >
     {% if messages[0]['role'] == 'system' -%}
         {%- set loop_messages = messages[1:] -%}
