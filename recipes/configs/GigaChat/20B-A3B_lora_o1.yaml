@@ -19,7 +19,6 @@ model:
   class: transformers.AutoModelForCausalLM
   name: ai-sage/GigaChat-20B-A3B-instruct
   attn_implementation: flash_attention_2
-  llm_int8_enable_fp32_cpu_offload: true
   load_in_4bit: true
   load_in_8bit: false
   dtype: bf16
