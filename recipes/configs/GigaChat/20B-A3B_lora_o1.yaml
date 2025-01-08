@@ -14,7 +14,7 @@ datasets:
       output: response
 
 model:
-  class: transformers.AutoTokenizer
+  class: custom.gigachat.DeepseekForCausalLM
   name: ai-sage/GigaChat-20B-A3B-instruct-bf16
   attn_implementation: flash_attention_2
   load_in_4bit: true
