@@ -77,6 +77,12 @@ def finetune(
     if "class" in config["tokenizer"]:
         tokenizer_class = config["tokenizer"]["class"]
 
+    # Class to work with Tokenizer
+    trainer_class = "transformers.Trainer"
+    if "class" in config["tokenizer"]:
+        trainer_class = config["trainer"]["class"]
+        del config["trainer"]["class"]
+
     # Read repo_id of tokenizer or path to configs on disk#
     tokenizer_name = None
     if "name" in config["tokenizer"]:
@@ -159,7 +165,7 @@ def finetune(
     if "attn_implementation" in config["model"]:
         attn_implementation = config["model"]["attn_implementation"]
 
-    # Init model object
+    # Load model class
     model_obj = dynamic_import(model_class)
 
     # If model name is set then pre-train
@@ -219,8 +225,11 @@ def finetune(
         **training_args_dict
     )
 
+    # Load trainer class object
+    trainer_obj = dynamic_import(trainer_class)
+
     # Init trainer object and pass all important parameters to it
-    trainer = Trainer(
+    trainer = trainer_obj(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
