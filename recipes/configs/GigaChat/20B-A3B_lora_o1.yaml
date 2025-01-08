@@ -74,7 +74,7 @@ trainer:
   gradient_accumulation_steps: 8
   logging_steps: 1
   learning_rate: 0.0004
-  num_train_epochs: 3
+  num_train_epochs: 2
   lr_scheduler_type: cosine
   warmup_steps: 16
   optim: adamw_torch_4bit
