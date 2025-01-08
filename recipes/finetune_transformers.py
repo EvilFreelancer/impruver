@@ -13,7 +13,7 @@ from transformers import (
     DataCollatorForTokenClassification,
     AutoTokenizer
 )
-from peft import get_peft_model, LoraConfig
+from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 
 from impruver.utils import set_seed, read_jsonl, get_dtype, dynamic_import
 from impruver.data import DEFAULT_CHAT_TEMPLATE
@@ -68,7 +68,7 @@ def finetune(
         output_dir = config['output_dir']
 
     # Get settings of trainer object
-    trainer_config = config.get("trainer", {})
+    trainer_config = config.get("trainer", {"gradient_checkpointing": False})
 
     # Get settings of Peft/LoRA adapter
     lora_config = config.get("lora", None)
@@ -214,6 +214,13 @@ def finetune(
     # If we need to train a LoRA adapter
     if lora_config:
         lora_config = LoraConfig(**lora_config)
+
+        if load_in_4bit or load_in_8bit:
+            model = prepare_model_for_kbit_training(
+                model=model,
+                use_gradient_checkpointing=trainer_config.gradient_checkpointing
+            )
+
         model = get_peft_model(model, lora_config)
         model.print_trainable_parameters()
 
