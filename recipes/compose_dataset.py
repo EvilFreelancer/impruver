@@ -143,6 +143,10 @@ def compose_dataset(
     # Get tokenizer
     tokenizer = AutoTokenizer.from_pretrained(config['tokenizer']['name'])
 
+    # Use provided chat_template if set in config
+    if 'chat_template' in config['tokenizer']:
+        tokenizer.chat_template = config['tokenizer']['chat_template']
+
     # Default max_tokens_count from tokenizer
     max_tokens_count = tokenizer.model_max_length
 

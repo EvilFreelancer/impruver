@@ -126,6 +126,10 @@ def finetune(
         # If it doesn't exist, use default
         tokenizer.chat_template = DEFAULT_CHAT_TEMPLATE
 
+    # Use provided chat_template if set in config
+    if 'chat_template' in config['tokenizer']:
+        tokenizer.chat_template = config['tokenizer']['chat_template']
+
     # Save tokenizer object with all configs to an output folder
     tokenizer.save_pretrained(output_dir)
 

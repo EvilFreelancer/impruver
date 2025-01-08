@@ -8,8 +8,8 @@ val_path: ./val.GigaChat_20B-A3B_lora_thinking.jsonl
 datasets:
   - name: Egor-AI/Russian_thinking_dataset
     converter: impruver.instruction_to_messages
-    add_global_bos: false
-    add_global_eos: false
+    #add_global_bos: false
+    #add_global_eos: false
     mapping:
       system: system
       instruction: prompt
@@ -35,6 +35,29 @@ tokenizer:
   class: transformers.AutoTokenizer
   name: ai-sage/GigaChat-20B-A3B-instruct
   max_tokens_count: 1500
+  chat_template: >
+    {% if messages[0]['role'] == 'system' -%}
+        {%- set loop_messages = messages[1:] -%}
+        {%- set system_message = bos_token + messages[0]['content'] + additional_special_tokens[1] -%}
+    {%- else -%}
+        {%- set loop_messages = messages -%}
+        {%- set system_message = bos_token + '' -%}
+    {%- endif -%}
+    {%- for message in messages %}
+        {%- if message['role'] == 'system' -%}
+            {{ system_message -}}
+        {%- endif -%}
+        {%- if message['role'] == 'user' -%}
+            {{ message['role'] + additional_special_tokens[0] + message['content'] + additional_special_tokens[1] -}}
+            {{ 'available functions' + additional_special_tokens[0] + additional_special_tokens[2] + additional_special_tokens[3]  + additional_special_tokens[1] -}}
+        {%- endif -%}
+        {%- if message['role'] == 'assistant' -%}
+            {{ message['role'] + additional_special_tokens[0] + message['content'] + additional_special_tokens[1] -}}
+        {%- endif -%}
+        {%- if loop.last and add_generation_prompt -%}
+            {{ 'assistant' + additional_special_tokens[0] -}}
+        {%- endif -%}
+    {%- endfor %}
 
 trainer:
   eval_strategy: steps
