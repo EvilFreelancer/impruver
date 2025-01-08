@@ -79,7 +79,7 @@ def finetune(
 
     # Class to work with Tokenizer
     trainer_class = "transformers.Trainer"
-    if "class" in config["tokenizer"]:
+    if "class" in config["trainer"]:
         trainer_class = config["trainer"]["class"]
         del config["trainer"]["class"]
 
