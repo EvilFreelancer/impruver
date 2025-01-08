@@ -314,9 +314,10 @@ class DeepseekMoE(nn.Module):
         hidden_states = hidden_states.view(-1, hidden_states.shape[-1])
         flat_topk_idx = topk_idx.view(-1)
         if self.training:
-            y = self.moe_train(hidden_states, flat_topk_idx, topk_weight.view(-1, 1))
-            y = y.view(*orig_shape)
-            y = AddAuxiliaryLoss.apply(y, aux_loss)
+            # y = self.moe_train(hidden_states, flat_topk_idx, topk_weight.view(-1, 1))
+            # y = y.view(*orig_shape)
+            # y = AddAuxiliaryLoss.apply(y, aux_loss)
+            y = self.moe_infer(hidden_states, flat_topk_idx, topk_weight.view(-1, 1)).view(*orig_shape)
         else:
             y = self.moe_infer(hidden_states, flat_topk_idx, topk_weight.view(-1, 1)).view(*orig_shape)
         if self.config.n_shared_experts is not None:
