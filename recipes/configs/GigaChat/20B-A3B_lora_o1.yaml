@@ -16,12 +16,13 @@ datasets:
       output: response
 
 model:
-  class: transformers.AutoModelForCausalLM
+  class: custom.gigachat.DeepseekForCausalLM
   name: ai-sage/GigaChat-20B-A3B-instruct-bf16
   attn_implementation: flash_attention_2
   load_in_4bit: true
   load_in_8bit: false
   dtype: bf16
+  config_class: custom.gigachat.DeepseekConfig
 
 lora:
   r: 8
