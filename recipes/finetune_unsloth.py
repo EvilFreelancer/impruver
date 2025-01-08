@@ -121,6 +121,21 @@ def finetune(
     tokenizer_obj = dynamic_import(tokenizer_class)
     tokenizer = tokenizer_obj.from_pretrained(tokenizer_name)
 
+    # Add special tokens to tokenizer
+    if 'special_tokens' in config['tokenizer']:
+        special_tokens = {}
+        if 'pad_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['pad_token'] = config['tokenizer']['special_tokens']['pad_token']
+        if 'eos_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['eos_token'] = config['tokenizer']['special_tokens']['eos_token']
+        if 'bos_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['bos_token'] = config['tokenizer']['special_tokens']['bos_token']
+        if 'mask_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['mask_token'] = config['tokenizer']['special_tokens']['mask_token']
+        if 'unk_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['unk_token'] = config['tokenizer']['special_tokens']['unk_token']
+        tokenizer.add_special_tokens(special_tokens)
+
     # Check if `chat_template` attribute exists in tokenizer
     if not hasattr(tokenizer, 'chat_template') or tokenizer.chat_template is None:
         # If it doesn't exist, use default
