@@ -104,8 +104,32 @@ def finetune(
     if "load_in_8bit" in config["model"]:
         load_in_8bit = bool(config["model"]["load_in_8bit"])
 
+    #
+    # Trainer arguments preparation
+    #
+
     # Get ddp settings from config if available
     ddp_config = config.get("ddp", {})
+
+    # Merge trainer_config and ddp_config
+    training_args_dict = trainer_config.copy()
+    training_args_dict.update(ddp_config)
+
+    # Fixing "evaL_loss" issue
+    training_args_dict.update({"label_names": ["labels"]})
+
+    # If reporting to W&B is enabled
+    if report_to == "wandb":
+        os.environ["WANDB_MODE"] = "online"
+        wandb.init(project="impruver", name=str(config_path), config=config)
+
+    # Prepare trainer configuration
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        report_to=report_to,
+        run_name=str(config_path),
+        **training_args_dict
+    )
 
     #
     # Tokenizer preparation
@@ -218,7 +242,7 @@ def finetune(
         if load_in_4bit or load_in_8bit:
             model = prepare_model_for_kbit_training(
                 model=model,
-                use_gradient_checkpointing=trainer_config.gradient_checkpointing
+                use_gradient_checkpointing=training_args.gradient_checkpointing
             )
 
         model = get_peft_model(model, lora_config)
@@ -237,26 +261,6 @@ def finetune(
     #
     # Trainer
     #
-
-    # Merge trainer_config and ddp_config
-    training_args_dict = trainer_config.copy()
-    training_args_dict.update(ddp_config)
-
-    # Fixing "evaL_loss" issue
-    training_args_dict.update({"label_names": ["labels"]})
-
-    # If reporting to W&B is enabled
-    if report_to == "wandb":
-        os.environ["WANDB_MODE"] = "online"
-        wandb.init(project="impruver", name=str(config_path), config=config)
-
-    # Prepare trainer configuration
-    training_args = TrainingArguments(
-        output_dir=output_dir,
-        report_to=report_to,
-        run_name=str(config_path),
-        **training_args_dict
-    )
 
     # Load trainer class object
     trainer_obj = dynamic_import(trainer_class)
