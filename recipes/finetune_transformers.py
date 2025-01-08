@@ -169,11 +169,6 @@ def finetune(
     if "attn_implementation" in config["model"]:
         attn_implementation = config["model"]["attn_implementation"]
 
-    # Attention implementation
-    llm_int8_enable_fp32_cpu_offload = False
-    if "llm_int8_enable_fp32_cpu_offload" in config["model"]:
-        llm_int8_enable_fp32_cpu_offload = config["model"]["llm_int8_enable_fp32_cpu_offload"]
-
     # Load model class
     model_obj = dynamic_import(model_class)
 
@@ -186,7 +181,6 @@ def finetune(
             device_map=device_map if ddp_config else "auto",
             torch_dtype=dtype,
             attn_implementation=attn_implementation,
-            llm_int8_enable_fp32_cpu_offload=llm_int8_enable_fp32_cpu_offload,
             trust_remote_code=True,
         )
     else:
