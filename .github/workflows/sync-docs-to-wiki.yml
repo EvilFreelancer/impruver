@@ -28,6 +28,17 @@ jobs:
         run: |
           find . -type f -name '*.md' -exec \
             sed -i -E 's|\[([^]]*)\]\(([^)]*)\)|[\1](https://github.com/EvilFreelancer/impruver/blob/main/\2)|g' {} +
+      - name: Remove first h1 and shift headings
+        working-directory: wiki
+        run: |
+          # В одной find-команде используем несколько -e флагов для sed
+          find . -type f -name '*.md' -exec sed -i \
+            -e '1{/^# .*/d}' \
+            -e 's/^## /# /g' \
+            -e 's/^### /## /g' \
+            -e 's/^#### /### /g' \
+            -e 's/^##### /#### /g' \
+            -e 's/^###### /##### /g' {} +
       - name: Commit and push changes
         working-directory: wiki
         run: |
