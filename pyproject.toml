@@ -63,7 +63,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = [""]
-include = ["impruver*", "recipes*"]
+include = ["impruver*", "recipes*", "custom*"]
 
 [tool.setuptools.package-data]
 recipes = ["configs/*.yaml", "configs/*/*.yaml", "configs/*/*/*.yaml"]
