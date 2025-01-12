@@ -51,6 +51,18 @@ def finetune(
     report_to: str = "none",
     seed: int = 42,
 ):
+    """
+    Finetune a model using classes from `unsloth` package on a given configuration.
+
+    Args:
+        config (str): Path to the configuration file
+        train_path (str): Path to the training set
+        val_path (str): Path to the validation set
+        output_dir (str): Path where the model will be saved
+        report_to (str): Where to report the results
+        seed (int): Random(?) seed
+    """
+
     set_seed(seed)
     logging.set_verbosity_info()
 
@@ -80,7 +92,7 @@ def finetune(
         output_dir = config['output_dir']
 
     # Get settings of trainer object
-    trainer_config = config.get("trainer", {})
+    trainer_config = config.get("trainer", {"gradient_checkpointing": False})
 
     # Get settings of Peft/LoRA adapter
     lora_config = config.get("lora", None)
@@ -94,6 +106,12 @@ def finetune(
     tokenizer_class = "transformers.AutoTokenizer"
     if "class" in config["tokenizer"]:
         tokenizer_class = config["tokenizer"]["class"]
+
+    # Class to work with Tokenizer
+    trainer_class = "CustomTrainer"
+    if "class" in config["trainer"]:
+        trainer_class = config["trainer"]["class"]
+        del config["trainer"]["class"]
 
     # Read repo_id of tokenizer or path to configs on disk#
     tokenizer_name = None
@@ -110,8 +128,32 @@ def finetune(
     if "load_in_8bit" in config["model"]:
         load_in_8bit = bool(config["model"]["load_in_8bit"])
 
+    #
+    # Trainer arguments preparation
+    #
+
     # Get ddp settings from config if available
     ddp_config = config.get("ddp", {})
+
+    # Merge trainer_config and ddp_config
+    training_args_dict = trainer_config.copy()
+    training_args_dict.update(ddp_config)
+
+    # Fixing "evaL_loss" issue
+    training_args_dict.update({"label_names": ["labels"]})
+
+    # If reporting to W&B is enabled
+    if report_to == "wandb":
+        os.environ["WANDB_MODE"] = "online"
+        wandb.init(project="impruver", name=str(config_path), config=config)
+
+    # Prepare trainer configuration
+    training_args = UnslothTrainingArguments(
+        output_dir=output_dir,
+        report_to=report_to,
+        run_name=str(config_path),
+        **training_args_dict
+    )
 
     #
     # Tokenizer preparation
@@ -236,35 +278,31 @@ def finetune(
     # Trainer
     #
 
-    # Merge trainer_config and ddp_config
-    training_args_dict = trainer_config.copy()
-    training_args_dict.update(ddp_config)
-
-    # Fixing "evaL_loss" issue
-    training_args_dict.update({"label_names": ["labels"]})
-
-    # If reporting to W&B is enabled
-    if report_to == "wandb":
-        os.environ["WANDB_MODE"] = "online"
-        wandb.init(project="impruver", name=str(config_path), config=config)
-
-    # Prepare trainer configuration
-    training_args = UnslothTrainingArguments(
-        **trainer_config,
-        report_to=[report_to],
-        output_dir=output_dir
-    )
+    # Load trainer class object
+    trainer_obj = CustomTrainer
+    if trainer_class != "CustomTrainer":
+        trainer_obj = dynamic_import(trainer_class)
 
     # Init trainer object and pass all important parameters to it
-    trainer = CustomTrainer(
+    trainer = trainer_obj(
         model=model,
+        args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         data_collator=data_collator,
-        args=training_args,
     )
+
+    #
+    # Training loop
+    #
+
     trainer.train()
-    model.save_pretrained(output_dir)
+
+    #
+    # Saving results
+    #
+
+    model.save_pretrained(output_dir, safe_serialization=False)
 
 
 if __name__ == "__main__":
