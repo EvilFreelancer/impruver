@@ -1,5 +1,5 @@
 # Training time
-# - 1x RTX 4090 ~ 23Gb VRAM ~ 20h 30m
+# - 1x RTX 4090 ~ 23Gb VRAM ~ 116h 45m
 
 output_dir: ./models/GigaChat_20B-A3B_lora_thinking
 train_path: ./train.GigaChat_20B-A3B_lora_thinking.jsonl
