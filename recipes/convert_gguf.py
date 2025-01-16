@@ -22,7 +22,7 @@ def convert_gguf(
 
     Args:
         config (str): Path to the configuration file
-        llama_cpp_dir (str): Path to the llama.cpp directory
+        llama_cpp_convert_script (str): Path to the llama.cpp convert script
         llama_cpp_quantize_bin (str): Path to the llama-quantize binary
         quantizations (List[str]): List of quantizations to use
     """
