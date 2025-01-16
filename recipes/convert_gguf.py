@@ -80,7 +80,7 @@ def convert_gguf(
                 output_dir,
                 device_map={"": "cpu"},
                 trust_remote_code=True
-            ).to("cpu")
+            )
             model_processed = peft_model.merge_and_unload()
             model_processed.save_pretrained(processing_dir)
         else:

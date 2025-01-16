@@ -1,15 +1,17 @@
+import os
 import yaml
 import json
 import random
 import fire
 
 from datasets import load_dataset
-from transformers import AutoTokenizer
+from transformers import logging
 from datasketch import MinHash, MinHashLSH, LeanMinHash
 from tqdm import tqdm
 
 from impruver.dataset import ChatDataset
-from impruver.utils import dynamic_import
+from impruver.utils import set_seed, dynamic_import
+from impruver.data import DEFAULT_CHAT_TEMPLATE
 
 
 def calc_fingerprint(tokens, num_perm=128):
@@ -119,7 +121,8 @@ def split_and_save_records(records: list, train_path: str, val_path: str):
 def compose_dataset(
     config: str,
     train_path: str = None,
-    val_path: str = None
+    val_path: str = None,
+    seed: int = 42,
 ):
     """
     Compose a dataset from multiple datasets specified in the config file.
@@ -128,10 +131,25 @@ def compose_dataset(
         config (str): Path to the config file
         train_path (str): Path to the train set
         val_path (str): Path to the validation set
+        seed (int): Random(?) seed
     """
 
-    # Load the config file
-    with open(config, "r") as r:
+    set_seed(seed)
+    logging.set_verbosity_info()
+
+    #
+    # Load configuration
+    #
+
+    if os.path.exists(config):
+        config_path = config
+    else:
+        import recipes
+        recipes_path = os.path.join(recipes.__path__[0])
+        config_path = recipes_path + '/configs/' + config + '.yaml'
+
+    # Read config
+    with open(config_path, "r") as r:
         config = yaml.safe_load(r)
 
     # Get paths to train and validation sets
@@ -140,12 +158,53 @@ def compose_dataset(
     if val_path is None:
         val_path = config['val_path']
 
-    # Get tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(config['tokenizer']['name'])
+    # Class to work with Tokenizer
+    tokenizer_class = "transformers.AutoTokenizer"
+    if "class" in config["tokenizer"]:
+        tokenizer_class = config["tokenizer"]["class"]
+
+    # Read repo_id of tokenizer or path to configs on disk#
+    tokenizer_name = None
+    if "name" in config["tokenizer"]:
+        tokenizer_name = config["tokenizer"]["name"]
+    elif "name" in config["model"]:
+        tokenizer_name = config["model"]["name"]
+
+    #
+    # Tokenizer preparation
+    #
+
+    # Init tokenizer object
+    tokenizer_obj = dynamic_import(tokenizer_class)
+    tokenizer = tokenizer_obj.from_pretrained(tokenizer_name, trust_remote_code=True)
+
+    # Add special tokens to tokenizer
+    if 'special_tokens' in config['tokenizer']:
+        special_tokens = {}
+        if 'pad_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['pad_token'] = config['tokenizer']['special_tokens']['pad_token']
+        if 'eos_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['eos_token'] = config['tokenizer']['special_tokens']['eos_token']
+        if 'bos_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['bos_token'] = config['tokenizer']['special_tokens']['bos_token']
+        if 'mask_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['mask_token'] = config['tokenizer']['special_tokens']['mask_token']
+        if 'unk_token_id' in config['tokenizer']['special_tokens']:
+            special_tokens['unk_token'] = config['tokenizer']['special_tokens']['unk_token']
+        tokenizer.add_special_tokens(special_tokens)
+
+    # Check if `chat_template` attribute exists in tokenizer
+    if not hasattr(tokenizer, 'chat_template') or tokenizer.chat_template is None:
+        # If it doesn't exist, use default
+        tokenizer.chat_template = DEFAULT_CHAT_TEMPLATE
 
     # Use provided chat_template if set in config
     if 'chat_template' in config['tokenizer']:
         tokenizer.chat_template = config['tokenizer']['chat_template']
+
+    #
+    # Tokenizer chat length
+    #
 
     # Default max_tokens_count from tokenizer
     max_tokens_count = tokenizer.model_max_length
@@ -156,6 +215,10 @@ def compose_dataset(
 
     # Prevent automatic truncation by setting model_max_length to a large value
     tokenizer.model_max_length = int(1e30)  # Disable automatic truncation
+
+    #
+    # Make work
+    #
 
     # Step 1: Load datasets
     records = load_datasets(config, tokenizer, max_tokens_count)
