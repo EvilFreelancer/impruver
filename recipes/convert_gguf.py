@@ -90,7 +90,7 @@ def convert_gguf(
     # Convert to GGUF format
     #
 
-    gguf_model_path = os.path.join(gguf_dir, "model-fp16.gguf")
+    gguf_model_path = os.path.join(gguf_dir, "model-f16.gguf")
 
     # If we need not only quantize model
     if not only_quantize:
