@@ -11,8 +11,8 @@ from impruver.utils import dynamic_import
 
 def convert_gguf(
     config: str,
-    llama_cpp_dir: str = "../llama.cpp",
-    llama_cpp_quantize_bin: str = "../llama.cpp/llama-quantize",
+    llama_cpp_convert_script: str = "../llama.cpp/convert_hf_to_gguf.py",
+    llama_cpp_quantize_bin: str = "../llama.cpp/build/bin/llama-quantize",
     quantizations: List[str] = ["q8_0", "q5_0", "q4_0", "q2_k"],
 ):
     """
@@ -81,10 +81,9 @@ def convert_gguf(
     #
 
     gguf_model_path = os.path.join(gguf_dir, "model-fp16.gguf")
-    convert_script = os.path.join(llama_cpp_dir, "convert_hf_to_gguf.py")
 
     print("Converting model to GGUF (FP16)...")
-    convert_cmd = ["python", convert_script, "--outtype", "f16", "--outfile", gguf_model_path, processing_dir]
+    convert_cmd = ["python", llama_cpp_convert_script, "--outtype", "f16", "--outfile", gguf_model_path, processing_dir]
     subprocess.run(convert_cmd, check=True)
 
     # Create the Modelfile.f16
