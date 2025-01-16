@@ -60,15 +60,19 @@ def convert_gguf(
 
     # If LoRA is enabled, we assume we have a LoRA adapter in output_dir
     if config.get("lora", None):
-        # This mean we need to merge an adapter into a model then save result to disk
-        peft_model = AutoPeftModelForCausalLM.from_pretrained(output_dir, device_map={"": "cpu"}).to("cpu")
-        model_processed = peft_model.merge_and_unload()
-        model_processed.save_pretrained(processing_dir)
-
         # Next need to save tokenizer into the same folder
         tokenizer_obj = dynamic_import(tokenizer_class)
-        tokenizer = tokenizer_obj.from_pretrained(output_dir)
+        tokenizer = tokenizer_obj.from_pretrained(output_dir, trust_remote_code=True)
         tokenizer.save_pretrained(processing_dir)
+
+        # This mean we need to merge an adapter into a model then save result to disk
+        peft_model = AutoPeftModelForCausalLM.from_pretrained(
+            output_dir,
+            device_map={"": "cpu"},
+            trust_remote_code=True
+        ).to("cpu")
+        model_processed = peft_model.merge_and_unload()
+        model_processed.save_pretrained(processing_dir)
     else:
         processing_dir = output_dir
 

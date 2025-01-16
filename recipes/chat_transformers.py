@@ -84,7 +84,7 @@ def chat(
 
     # Init tokenizer object
     tokenizer_obj = dynamic_import(tokenizer_class)
-    tokenizer = tokenizer_obj.from_pretrained(output_dir)
+    tokenizer = tokenizer_obj.from_pretrained(output_dir, trust_remote_code=True)
 
     #
     # Model preparation
@@ -134,7 +134,8 @@ def chat(
         quantization_config=quantization_config,
         device_map=None if ddp_config else "auto",  # need to be disabled for DDP
         torch_dtype=dtype,
-        attn_implementation=attn_implementation
+        attn_implementation=attn_implementation,
+        trust_remote_code=True,
     )
 
     # If we've trained a LoRA adapter
