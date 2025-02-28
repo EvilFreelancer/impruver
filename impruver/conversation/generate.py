@@ -1,5 +1,5 @@
 def generate(model, tokenizer, prompt, generation_config):
-    data = tokenizer(prompt, return_tensors="pt")
+    data = tokenizer(prompt, return_token_type_ids=False, return_tensors="pt")
     data = {k: v.to(model.device) for k, v in data.items()}
     output_ids = model.generate(**data, generation_config=generation_config)[0]
     output_ids = output_ids[len(data["input_ids"][0]):]
