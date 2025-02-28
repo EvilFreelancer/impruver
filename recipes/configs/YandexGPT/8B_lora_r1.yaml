@@ -8,18 +8,26 @@ val_path: ./val.YandexGPT-5-Lite_7B_lora_thinking.jsonl
 datasets:
   - name: mizinovmv/ru_example_DeepSeek-R1-Distill-Qwen-32B
     converter: impruver.instruction_to_messages
+    add_global_bos: false
+    add_global_eos: false
     mapping:
       instruction: ru_query
       output: response
   - name: lightblue/reasoning-multilingual-R1-Llama-70B-train
     converter: impruver.instruction_to_messages
+    add_global_bos: false
+    add_global_eos: false
     mapping:
       instruction: translated_prompt
       output: response
   - name: Pinkstack/thinking-multilingual-30-23-full-690
     converter: impruver.instruction_to_messages
+    add_global_bos: false
+    add_global_eos: false
   - name: Vikhrmodels/reasoning-0.01-ru
     converter: impruver.reasoning_to_messages
+    add_global_bos: false
+    add_global_eos: false
 
 model:
   class: transformers.AutoModelForCausalLM
