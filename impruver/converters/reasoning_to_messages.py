@@ -16,7 +16,7 @@ def reasoning_to_messages(sample: dict, mapping: dict = None) -> list | None:
     system_key = mapping.get("system", None) if mapping else None
 
     instruction = sample.get(instruction_key, "")
-    output = '<think>' + sample.get(reasoning_key, "") + '</think>\n\n' + sample.get(output_key, "")
+    output = '<think>\n' + sample.get(reasoning_key, "") + '\n</think>\n\n' + sample.get(output_key, "")
     messages = [
         {"role": "user", "content": instruction},
         {"role": "assistant", "content": output}
