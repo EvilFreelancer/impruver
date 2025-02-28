@@ -28,6 +28,14 @@ datasets:
     converter: impruver.reasoning_to_messages
     add_global_bos: false
     add_global_eos: false
+  - name: Vikhrmodels/russian_math
+    converter: impruver.reasoning_to_messages
+    add_global_bos: false
+    add_global_eos: false
+    mapping:
+      instruction: task
+      reasoning: solution
+      output: short answer
 
 model:
   class: transformers.AutoModelForCausalLM
@@ -48,12 +56,15 @@ tokenizer:
   class: transformers.AutoTokenizer
   name: yandex/YandexGPT-5-Lite-8B-pretrain
   max_tokens_count: 1500
+  special_tokens:
+    pad_token_id: 1
+    pad_token: <s>
 
 trainer:
   eval_strategy: steps
   save_strategy: steps
-  eval_steps: 100
-  save_steps: 100
+  eval_steps: 1000
+  save_steps: 1000
   per_device_train_batch_size: 1
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 8
