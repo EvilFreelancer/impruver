@@ -63,7 +63,7 @@ lora:
 tokenizer:
   class: transformers.AutoTokenizer
   name: yandex/YandexGPT-5-Lite-8B-pretrain
-  max_tokens_count: 1500
+  max_tokens_count: 1400
   special_tokens:
     pad_token_id: 1
     pad_token: <s>
