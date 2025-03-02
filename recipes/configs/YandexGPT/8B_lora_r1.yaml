@@ -1,5 +1,5 @@
 # Training time
-# - 1x RTX 4090 ~ _Gb VRAM ~ _h _m
+# - 1x RTX 4090 ~ 23.5Gb VRAM ~ 15h
 
 output_dir: ./models/YandexGPT-5-Lite_7B_lora_thinking
 train_path: ./train.YandexGPT-5-Lite_7B_lora_thinking.jsonl
