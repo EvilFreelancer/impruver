@@ -8,7 +8,7 @@ from peft import AutoPeftModelForCausalLM
 
 from impruver.utils import dynamic_import
 
-DEFAULT_QUANTIZATION_LEVELS = ["q8_0", "q5_0", "q4_0", "q2_k"]
+DEFAULT_QUANTIZATION_LEVELS = ["q8_0", "q5_0", "q4_0", "q4_k_m", "q2_k"]
 
 
 def convert_gguf(
