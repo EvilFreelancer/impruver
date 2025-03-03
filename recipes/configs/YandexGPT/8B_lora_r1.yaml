@@ -1,5 +1,5 @@
 # Training time
-# - 1x RTX 4090 ~ _Gb VRAM ~ _h _m
+# - 1x RTX 4090 ~ 23.5Gb VRAM ~ 15h
 
 output_dir: ./models/YandexGPT-5-Lite_7B_lora_thinking
 train_path: ./train.YandexGPT-5-Lite_7B_lora_thinking.jsonl
@@ -36,6 +36,14 @@ datasets:
       instruction: task
       reasoning: solution
       output: short answer
+  - name: kristaller486/Nebo-T1-Russian
+    converter: impruver.reasoning_to_messages
+    add_global_bos: false
+    add_global_eos: false
+    mapping:
+      instruction: prompt
+      reasoning: think
+      output: answer
 
 model:
   class: transformers.AutoModelForCausalLM
@@ -45,17 +53,17 @@ model:
   dtype: bf16
 
 lora:
-  r: 8
-  lora_alpha: 16
+  r: 8            # higher increases accuracy and memory
+  lora_alpha: 16  # usually alpha=2*rank
   lora_dropout: 0
   bias: none
-  target_modules: [ q_proj, v_proj, output_proj ]
+  target_modules: [ 'q_proj', 'v_proj', 'output_proj' ]
   task_type: CAUSAL_LM
 
 tokenizer:
   class: transformers.AutoTokenizer
   name: yandex/YandexGPT-5-Lite-8B-pretrain
-  max_tokens_count: 1450
+  max_tokens_count: 1400
   special_tokens:
     pad_token_id: 1
     pad_token: <s>
@@ -69,8 +77,8 @@ trainer:
   per_device_eval_batch_size: 1
   gradient_accumulation_steps: 8
   logging_steps: 10
-  learning_rate: 0.0003
-  num_train_epochs: 3
+  learning_rate: 0.000005
+  num_train_epochs: 2
   lr_scheduler_type: cosine
   warmup_steps: 100
   optim: adamw_torch_4bit
